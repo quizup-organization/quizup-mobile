@@ -9,7 +9,7 @@ import { exchangeAuthorizationCode } from "@/lib/auth";
 import { useSessionStore } from "./session-store";
 
 /**
- * WebView d'autorisation OIDC. Partage le cookie jar natif avec le `POST /api/auth/login`
+ * WebView d'autorisation OIDC. Partage le cookie jar natif avec l'authentification OTP (`POST /api/auth/verify-code`)
  * effectué juste avant : `/oauth2/authorize` émet alors directement le code, intercepté sur
  * la redirection `quizup://callback`.
  */

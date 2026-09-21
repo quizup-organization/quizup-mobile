@@ -60,7 +60,7 @@ export const REDIRECT_URI = "quizup://callback";
 
 /**
  * URL d'autorisation OIDC (Authorization Code + PKCE) pour la WebView d'authentification.
- * La session `AUTH_TX` étant créée par `POST /api/auth/login` dans le cookie jar partagé
+ * La session `AUTH_TX` étant créée par `POST /api/auth/verify-code` dans le cookie jar partagé
  * avec la WebView, `/oauth2/authorize` émet directement le code.
  */
 export function buildAuthorizeUrl(challenge: string, state: string): string {

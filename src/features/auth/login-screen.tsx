@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,20 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { authService } from "@/lib/services/auth";
-import { buildAuthorizeUrl } from "@/lib/auth";
-import { createPkce } from "@/lib/pkce";
-import { useSessionStore } from "./session-store";
 
 const schema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
-  password: z.string().min(1, "Mot de passe requis"),
 });
 
 type Values = z.infer<typeof schema>;
 
 export function LoginScreen() {
   const router = useRouter();
-  const setPkce = useSessionStore((s) => s.setPkce);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -33,19 +28,17 @@ export function LoginScreen() {
     formState: { errors },
   } = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "" },
   });
 
   const onSubmit = async (values: Values) => {
     setError(null);
     setPending(true);
     try {
-      await authService.login(values.email, values.password);
-      const { verifier, challenge, state } = await createPkce();
-      setPkce(verifier, buildAuthorizeUrl(challenge, state));
-      router.push("/auth-webview");
+      await authService.requestCode(values.email);
+      router.push({ pathname: "/(auth)/verify-code", params: { email: values.email } });
     } catch {
-      setError("Identifiants invalides. Réessaie.");
+      setError("Impossible d'envoyer le code. Réessaie.");
     } finally {
       setPending(false);
     }
@@ -56,7 +49,7 @@ export function LoginScreen() {
       <View className="mb-6 gap-1">
         <Text className="text-2xl font-extrabold">Connexion</Text>
         <Text className="text-sm text-muted-foreground">
-          Accède à ton compte QuizUp.
+          Entre ton e-mail : on t'envoie un code de connexion.
         </Text>
       </View>
 
@@ -81,42 +74,14 @@ export function LoginScreen() {
           )}
         </View>
 
-        <View className="gap-2">
-          <Text className="text-sm font-medium">Mot de passe</Text>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => (
-              <Input
-                value={field.value}
-                onChangeText={field.onChange}
-                secureTextEntry
-                placeholder="••••••••"
-              />
-            )}
-          />
-          {errors.password && (
-            <Text className="text-xs text-destructive">
-              {errors.password.message}
-            </Text>
-          )}
-        </View>
-
         {error && <Text className="text-xs text-destructive">{error}</Text>}
 
         <Button
-          label={pending ? "Connexion…" : "Se connecter"}
+          label={pending ? "Envoi…" : "Recevoir un code"}
           disabled={pending}
           onPress={handleSubmit(onSubmit)}
         />
       </Card>
-
-      <View className="mt-4 flex-row justify-center gap-1">
-        <Text className="text-sm text-muted-foreground">Pas encore de compte ?</Text>
-        <Link href="/(auth)/register">
-          <Text className="text-sm font-semibold underline">Créer un compte</Text>
-        </Link>
-      </View>
     </Screen>
   );
 }

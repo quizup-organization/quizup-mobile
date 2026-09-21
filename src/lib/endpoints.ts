@@ -6,8 +6,8 @@ import { config } from "./config";
  */
 export const ENDPOINTS = {
   auth: {
-    login: `${config.oidcAuthority}/api/auth/login`,
-    register: `${config.oidcAuthority}/api/auth/register`,
+    requestCode: `${config.oidcAuthority}/api/auth/request-code`,
+    verifyCode: `${config.oidcAuthority}/api/auth/verify-code`,
     logout: `${config.oidcAuthority}/api/auth/logout`,
   },
   topics: {

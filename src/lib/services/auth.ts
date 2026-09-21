@@ -7,18 +7,19 @@ export interface AuthResponse {
 }
 
 /**
- * API JSON d'authentification : crée la session interactive temporaire (cookie `AUTH_TX`).
- * Le pipeline OIDC (code d'autorisation + PKCE) est ensuite déclenché par `loginRedirect`.
+ * API JSON d'authentification passwordless (code OTP email).
+ * `requestCode` déclenche l'envoi du code ; `verifyCode` établit la session interactive
+ * temporaire (cookie `AUTH_TX`) avant le pipeline OIDC (PKCE via WebView).
  */
 export const authService = {
-  login: (email: string, password: string): Promise<AuthResponse> =>
-    api.post<AuthResponse>(ENDPOINTS.auth.login, { email, password }, {
+  requestCode: (email: string): Promise<void> =>
+    api.post<void>(ENDPOINTS.auth.requestCode, { email }, {
       absolute: true,
       credentials: "include",
     }),
 
-  register: (email: string, password: string): Promise<AuthResponse> =>
-    api.post<AuthResponse>(ENDPOINTS.auth.register, { email, password }, {
+  verifyCode: (email: string, code: string): Promise<AuthResponse> =>
+    api.post<AuthResponse>(ENDPOINTS.auth.verifyCode, { email, code }, {
       absolute: true,
       credentials: "include",
     }),

@@ -25,7 +25,7 @@ Hors périmètre : création de sujets/questions, mur de thème/chat.
 ```
 app/                       # expo-router (couche mince)
   _layout.tsx  index.tsx
-  (auth)/{_layout,login,register}.tsx
+  (auth)/{_layout,login,verify-code}.tsx
   auth-webview.tsx
   (app)/{_layout,index,topics,profile}.tsx  (app)/topic/[id].tsx
 src/
@@ -59,7 +59,8 @@ Variables (`.env`) : `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_OIDC_AUTHORITY`, `EXPO_
 
 ## 4. Authentification (point sensible)
 
-1. `POST {identity}/api/auth/login|register` (stack réseau natif → cookie `AUTH_TX` dans le jar natif).
+1. `POST {identity}/api/auth/request-code` puis `POST /api/auth/verify-code` (stack réseau natif →
+   cookie `AUTH_TX` dans le jar natif).
 2. `expo-crypto` génère le couple PKCE (verifier/challenge S256).
 3. WebView (`react-native-webview`) charge `/oauth2/authorize` (jar partagé → session vue) et
    intercepte la redirection `quizup://callback?code=…`.
@@ -97,9 +98,9 @@ Voir `web-applications/quizup-web/AGENTS.md` § 4.
   composites `TopicIcon`, `TopicCard`, `TopicCarousel`, `SectionHeader`, `Screen`, `StatStrip`, `WinLossBar`.
 - **Couche données** : `lib/api-client` (fetch RN, sans `URL`/`URLSearchParams`), `endpoints`,
   services + hooks React Query **identiques au web** (`lib/services`, `features/*/hooks`).
-- **Auth** : `POST /api/auth/login|register` → PKCE S256 (`lib/pkce.ts`) → **WebView** partageant le
-  cookie `AUTH_TX` → `/oauth2/authorize` → interception `quizup://callback` → `/oauth2/token`.
-  Stockage via `lib/storage.ts` (SecureStore natif / `localStorage` web).
+- **Auth** : `POST /api/auth/request-code` + `verify-code` (OTP email) → PKCE S256 (`lib/pkce.ts`) →
+  **WebView** partageant le cookie `AUTH_TX` → `/oauth2/authorize` → interception `quizup://callback`
+  → `/oauth2/token`. Stockage via `lib/storage.ts` (SecureStore natif / `localStorage` web).
 - **Navigation** : `app/` expo-router — `(auth)/login|register`, `auth-webview`, `(app)` onglets
   **Accueil / Sujets / Profil**, routes `topic/[id]` et `settings`.
 - **Écrans** : Accueil (bandeaux suivis + tendances), Sujets (recherche debouncée, facettes
