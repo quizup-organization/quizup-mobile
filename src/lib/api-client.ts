@@ -5,6 +5,7 @@ interface ApiClientConfig {
   defaultHeaders?: Record<string, string>;
   onError?: (error: ApiError) => void;
   getAuthToken?: () => string | null;
+  onUnauthorized?: () => Promise<boolean>;
 }
 
 interface RequestOptions extends Omit<RequestInit, "body"> {
@@ -38,12 +39,13 @@ function buildUrl(
  * Volontairement sans `URL`/`URLSearchParams` (support RN hétérogène).
  */
 export function createApiClient(clientConfig: ApiClientConfig) {
-  const { baseUrl, defaultHeaders = {}, onError, getAuthToken } = clientConfig;
+  const { baseUrl, defaultHeaders = {}, onError, getAuthToken, onUnauthorized } = clientConfig;
 
   async function request<T>(
     method: string,
     path: string,
     options: RequestOptions = {},
+    retried = false,
   ): Promise<T> {
     const { params, body, headers: reqHeaders, absolute, ...fetchOptions } =
       options;
@@ -66,6 +68,12 @@ export function createApiClient(clientConfig: ApiClientConfig) {
     });
 
     if (!response.ok) {
+      if (response.status === 401 && !retried && onUnauthorized) {
+        const refreshed = await onUnauthorized();
+        if (refreshed) {
+          return request<T>(method, path, options, true);
+        }
+      }
       const error: ApiError = await response.json().catch(() => ({
         message: response.statusText,
         statusCode: response.status,

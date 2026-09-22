@@ -8,7 +8,8 @@ import { StatStrip } from "@/components/stat-strip";
 import { WinLossBar } from "@/components/win-loss-bar";
 import { useCurrentPlayer } from "./use-current-player";
 import { titleForLevel } from "@/shared/utils/level";
-import { clearSession } from "@/lib/auth";
+import { clearSession, getRefreshToken } from "@/lib/auth";
+import { authService } from "@/lib/services/auth";
 import { useSessionStore } from "@/features/auth/session-store";
 import { useRouter } from "expo-router";
 
@@ -74,6 +75,11 @@ export function ProfileScreen() {
         variant="outline"
         label="Se déconnecter"
         onPress={async () => {
+          try {
+            await authService.logout(getRefreshToken() ?? undefined);
+          } catch {
+            // session déjà expirée : on purge quand même côté client
+          }
           await clearSession();
           setSession(false);
           router.replace("/(auth)/login");

@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useThemeStore, type Theme } from "@/lib/theme";
-import { clearSession } from "@/lib/auth";
+import { clearSession, getRefreshToken } from "@/lib/auth";
+import { authService } from "@/lib/services/auth";
 import { profilesService } from "@/lib/services/profiles";
 import { queryKeys } from "@/lib/query-keys";
 import { useSessionStore } from "@/features/auth/session-store";
@@ -139,6 +140,11 @@ export function SettingsScreen() {
         variant="outline"
         label="Se déconnecter"
         onPress={async () => {
+          try {
+            await authService.logout(getRefreshToken() ?? undefined);
+          } catch {
+            // session déjà expirée : on purge quand même côté client
+          }
           await clearSession();
           setSession(false);
           router.replace("/(auth)/login");

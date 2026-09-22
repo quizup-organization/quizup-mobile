@@ -6,10 +6,15 @@ const REFRESH_TOKEN_KEY = "quizup.refreshToken";
 const USER_ID_KEY = "quizup.userId";
 
 let accessToken: string | null = null;
+let refreshToken: string | null = null;
 let userId: string | null = null;
 
 export function getAccessToken(): string | null {
   return accessToken;
+}
+
+export function getRefreshToken(): string | null {
+  return refreshToken;
 }
 
 export function getUserId(): string | null {
@@ -38,18 +43,23 @@ async function persist(access: string, refresh?: string) {
   accessToken = access;
   userId = decodeUserId(access);
   await setItem(ACCESS_TOKEN_KEY, access);
-  if (refresh) await setItem(REFRESH_TOKEN_KEY, refresh);
+  if (refresh) {
+    refreshToken = refresh;
+    await setItem(REFRESH_TOKEN_KEY, refresh);
+  }
   if (userId) await setItem(USER_ID_KEY, userId);
 }
 
 export async function restoreSession(): Promise<boolean> {
   accessToken = await getItem(ACCESS_TOKEN_KEY);
+  refreshToken = await getItem(REFRESH_TOKEN_KEY);
   userId = (await getItem(USER_ID_KEY)) ?? (accessToken ? decodeUserId(accessToken) : null);
   return !!accessToken;
 }
 
 export async function clearSession(): Promise<void> {
   accessToken = null;
+  refreshToken = null;
   userId = null;
   await deleteItem(ACCESS_TOKEN_KEY);
   await deleteItem(REFRESH_TOKEN_KEY);
@@ -105,5 +115,39 @@ export async function exchangeAuthorizationCode(
   }
 
   const tokens = (await response.json()) as TokenResponse;
+  await persist(tokens.access_token, tokens.refresh_token);
+}
+
+interface RefreshTokenResponse {
+  access_token: string;
+  refresh_token?: string;
+}
+
+/**
+ * Renouvelle l'access token à partir du refresh token (grant refresh_token, client public).
+ * La rotation remplace le refresh token stocké sur succès.
+ */
+export async function refreshAccessToken(): Promise<void> {
+  if (!refreshToken) {
+    throw new Error("Aucun refresh token disponible");
+  }
+
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    client_id: config.oidcClientId,
+    refresh_token: refreshToken,
+  });
+
+  const response = await fetch(`${config.oidcAuthority}/oauth2/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Renouvellement du token impossible (${response.status})`);
+  }
+
+  const tokens = (await response.json()) as RefreshTokenResponse;
   await persist(tokens.access_token, tokens.refresh_token);
 }

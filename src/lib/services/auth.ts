@@ -24,9 +24,13 @@ export const authService = {
       credentials: "include",
     }),
 
-  logout: (): Promise<void> =>
-    api.post<void>(ENDPOINTS.auth.logout, undefined, {
-      absolute: true,
-      credentials: "include",
-    }),
+  logout: (refreshToken?: string): Promise<void> =>
+    api.post<void>(
+      ENDPOINTS.auth.logout,
+      refreshToken ? { refreshToken } : undefined,
+      {
+        absolute: true,
+        credentials: "include",
+      },
+    ),
 };
