@@ -1,5 +1,12 @@
 # AGENTS.md — quizup-mobile
 
+> ⚠️ **Non aligné sur la refonte des contrats BFF.** La surface BFF a changé (suppression des
+> `POST /search`, vues dédiées, `PUT/DELETE /{id}/follow`) et la mise en relation passe désormais
+> par l'**appariement public** (`/api/matchmaking/tickets` + `MatchmakingNotification`) et les
+> **salons privés** (`/api/lobbies` + `LobbyNotification`, lien `/join/{lobbyId}`). Le jeu
+> asynchrone (ghost/run) et les défis ont été supprimés. Le mobile reste sur l'ancienne surface
+> tant qu'une migration dédiée n'est pas planifiée : voir `services/quizup-bff/AGENTS.md` § 3.
+
 > Interface **mobile React Native (Expo)** de QuizUp — Expo Router + NativeWind + primitifs
 > « shadcn pour RN » (méthode react-native-reusables). Conventions : `best-practices/.frontend/`.
 

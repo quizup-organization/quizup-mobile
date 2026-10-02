@@ -121,7 +121,6 @@ export type GameStatus =
   | "FINISHED"
   | "CANCELED";
 
-export type GameMode = "SYNC" | "ASYNC";
 export type GamePlayerType = "HUMAN" | "BOT";
 export type GameRoundStatus = "CREATED" | "STARTED" | "CLOSED";
 export type GameRoundType =
@@ -155,7 +154,6 @@ export interface Game {
   player1Name: string;
   player2Id: string;
   player2Name: string;
-  mode: GameMode;
   opponent: GamePlayerType;
   status: GameStatus;
   player1Score: number;
