@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/quizup-organization/quizup-mobile/compare/v1.1.1...v1.1.2) (2026-10-20)
+
+### Bug Fixes
+
+* **mobile:** signe l'APK release avec le keystore de production ([cb0dd59](https://github.com/quizup-organization/quizup-mobile/commit/cb0dd592bf0f85ece10f82aa9d07fe76b78defc5))
+
 ## [1.1.1](https://github.com/quizup-organization/quizup-mobile/compare/v1.1.0...v1.1.1) (2026-10-20)
 
 ### Bug Fixes
