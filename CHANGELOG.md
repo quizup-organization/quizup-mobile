@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.0.0...v1.1.0) (2026-10-20)
+
+### Features
+
+* **mobile:** ajoute la connexion OTP, Google et Facebook ([a489e0c](https://github.com/quizup-organization/quizup-mobile/commit/a489e0c7dd634fbd675978db1107ca693b1d6b31))
+
 ## 1.0.0 (2026-10-20)
 
 ### Features
