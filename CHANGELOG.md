@@ -1,3 +1,9 @@
+## 1.0.0 (2026-10-20)
+
+### Features
+
+* **mobile:** reconstruit l'app sur Expo UI avec des données factices ([f28fc54](https://github.com/quizup-organization/quizup-mobile/commit/f28fc549300d428c5a8a8fea88aed04dd7a3e3b0))
+
 ## [2.2.0](https://github.com/quizup-organization/quizup-mobile/compare/v2.1.0...v2.2.0) (2026-10-19)
 
 ### Features
