@@ -78,10 +78,12 @@ npm run typecheck  # tsc --noEmit
 npm run doctor     # expo-doctor
 ```
 
-Variables (`.env`) : `EXPO_PUBLIC_API_URL` (BFF), `EXPO_PUBLIC_OIDC_AUTHORITY`
-(base identity locale, **injectée aussi par la CI en release**),
-`EXPO_PUBLIC_IDENTITY_URL` (override explicite facultatif — **ne jamais mettre une URL
-localhost dans le `.env` principal**, elle serait embarquée dans l'APK), `EXPO_PUBLIC_OIDC_CLIENT_ID`,
+Variables : copier `.env.example` en **`.env.local`** (ignoré par git — **aucun fichier
+`.env*` n'est versionné**, seul `.env.example` l'est). `EXPO_PUBLIC_API_URL` (BFF),
+`EXPO_PUBLIC_OIDC_AUTHORITY` (base identity locale, **injectée aussi par la CI en
+release**), `EXPO_PUBLIC_IDENTITY_URL` (override explicite facultatif — **ne jamais
+mettre une URL localhost dans le fichier d'environnement**, elle serait embarquée dans
+l'APK), `EXPO_PUBLIC_OIDC_CLIENT_ID`,
 `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (client OAuth2 Web Google, audience des ID tokens),
 `EXPO_PUBLIC_GOOGLE_SIGN_IN_ENABLED` (`false` masque Google sans retirer l'ID client),
 `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` / `EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME` (iOS, plus tard),
@@ -227,9 +229,10 @@ build ; sinon il est masqué et le plugin natif n'est **pas** ajouté (`app.conf
 
 **Configuration mobile** :
 
-- `.env` : `EXPO_PUBLIC_FACEBOOK_APP_ID=2122240041993058`,
-  `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN=<Client Token public>` (configuré),
-  `EXPO_PUBLIC_FACEBOOK_SIGN_IN_ENABLED=true`.
+- `.env.local` : `EXPO_PUBLIC_FACEBOOK_APP_ID=<App ID Meta public>`,
+  `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN=<Client Token>` (à rotationner côté Meta),
+  `EXPO_PUBLIC_FACEBOOK_SIGN_IN_ENABLED=true`. **Fichier jamais commité** — seul
+  `.env.example` est versionné.
 - GitHub : variable de dépôt `QUIZUP_FACEBOOK_CLIENT_TOKEN` (configurée, consommée par
   `.github/workflows/release.yml`). **Vide = APK sans Facebook** (bouton masqué, plugin absent).
 - Après changement : `npx expo prebuild --clean` puis build natif
