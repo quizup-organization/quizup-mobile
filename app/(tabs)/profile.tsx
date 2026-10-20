@@ -1,5 +1,6 @@
 import { Column, Row, Spacer } from "@expo/ui";
 import { useWindowDimensions } from "react-native";
+import { useAuth } from "@/auth/AuthProvider";
 import { profile } from "@/data/fixtures";
 import {
   AppAvatar,
@@ -16,6 +17,7 @@ import { radius, useColors } from "@/ui/theme";
 export default function ProfileScreen() {
   const { width } = useWindowDimensions();
   const c = useColors();
+  const { session, logout } = useAuth();
 
   const contentWidth = Math.min(width - 40, 480);
   const statWidth = Math.floor((contentWidth - 20) / 3);
@@ -28,6 +30,11 @@ export default function ProfileScreen() {
           <AppAvatar initials={profile.initials} size={76} />
           <Column spacing={2} alignment="center">
             <AppText variant="title">{profile.name}</AppText>
+            {session?.email ? (
+              <AppText variant="caption" tone="muted">
+                {session.email}
+              </AppText>
+            ) : null}
             <AppText variant="caption" tone="muted">
               {`Niveau ${profile.level} · ${profile.title}`}
             </AppText>
@@ -103,6 +110,19 @@ export default function ProfileScreen() {
           <AppRow icon="settings" title="Préférences" subtitle="Thème, langue, notifications" onPress={() => {}} />
           <AppRow icon="medal" title="Récompenses" subtitle="Titres et badges obtenus" onPress={() => {}} />
           <AppRow icon="trend" title="Statistiques" subtitle="Historique de tes parties" onPress={() => {}} />
+        </Column>
+      </Section>
+
+      <Section title="Compte">
+        <Column spacing={2}>
+          <AppRow
+            icon="logout"
+            title="Se déconnecter"
+            subtitle={session?.email}
+            onPress={() => {
+              void logout();
+            }}
+          />
         </Column>
       </Section>
     </Screen>

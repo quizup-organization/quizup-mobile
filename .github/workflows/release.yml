@@ -22,6 +22,7 @@ jobs:
       oidc-authority: https://identity.quizup.cnadjim.fr
       oidc-client-id: mobile
       google-web-client-id: 270229696016-9u3916ckfcludqv77uiebgir65j3eurk.apps.googleusercontent.com
+      google-ios-client-id: ${{ vars.QUIZUP_GOOGLE_IOS_CLIENT_ID }}
       facebook-app-id: "2122240041993058"
       # Valeur publique (Client Token), configurée en variable de dépôt GitHub.
       # Vide = bouton Facebook masqué et plugin natif non ajouté.

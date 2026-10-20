@@ -86,6 +86,10 @@ export const icons = {
     ios: "magnifyingglass",
     android: import("@expo/material-symbols/search.xml"),
   }),
+  logout: Icon.select({
+    ios: "rectangle.portrait.and.arrow.right",
+    android: import("@expo/material-symbols/logout.xml"),
+  }),
 } as const;
 
 export type IconKey = keyof typeof icons;

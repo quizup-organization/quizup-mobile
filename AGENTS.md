@@ -1,22 +1,24 @@
 # AGENTS.md — quizup-mobile
 
-> Application mobile **Expo SDK 57 + Expo UI (universal)**, reconstruite sur une base
-> blanche. **Aucun branchement backend, aucune authentification** : uniquement des
-> **données factices locales**. Objectif : valider l'interface native (SwiftUI sur iOS,
-> Material 3 sur Android) avant de rebrancher quoi que ce soit.
+> Application mobile **Expo SDK 57 + Expo UI (universal)**. L'**authentification
+> native est branchée** (OTP email, Google, Facebook) ; le reste de l'interface
+> utilise encore des **données factices locales**. Objectif : valider l'interface
+> native (SwiftUI sur iOS, Material 3 sur Android) tout en préparant le rebranchement BFF.
 
 ---
 
 ## 1. Rôle
 
-Application mobile QuizUp de démonstration :
+Application mobile QuizUp :
 
 - 5 onglets natifs : **Accueil · Sujets · Social · Alertes · Profil**.
 - Fiche sujet (`/topic/[id]`) et partie « démo » simulée.
-- Aucun appel réseau, aucun token, aucune session.
+- **Login** (`/login`) : OTP email, Google natif et Facebook natif ; session
+  QuizUp persistée dans `expo-secure-store` (access + refresh tokens).
+- Les écrans métier restent alimentés par `src/data/fixtures.ts`.
 
-Hors périmètre pour l'instant : auth (OTP/Google/Facebook), BFF, duel réel,
-notifications temps réel, web, administration.
+Hors périmètre pour l'instant : BFF métier, duel réel, notifications temps réel,
+web, administration.
 
 ---
 
@@ -28,18 +30,27 @@ notifications temps réel, web, administration.
 - `@expo/material-symbols` pour les icônes Android (SF Symbols côté iOS).
 - **Police système** (SF Pro / Roboto). Aucune police custom, aucun token web.
 - Aucun design system JS : ni HeroUI, ni NativeWind/Uniwind, ni Tailwind, ni `className`.
-- Aucune donnée distante : tout vit dans `src/data/fixtures.ts`.
+- Les écrans métier restent sur `src/data/fixtures.ts` ; seuls les appels d'auth
+  (`identity`) sortent du téléphone.
 
 ```
 app/
-  _layout.tsx                 # Stack racine + StatusBar
+  _layout.tsx                 # Stack racine + AuthProvider + gating + StatusBar
+  login.tsx                   # Login OTP + Google + Facebook (Expo UI universel)
   (tabs)/_layout.tsx          # onglets natifs
   (tabs)/{index,topics,social,notifications,profile}.tsx
   topic/[id].tsx              # fiche sujet (hors onglets)
 src/
+  auth/config.ts              # URLs identity + IDs publics Google/Facebook
+  auth/errors.ts              # AuthError / AuthCancelledError
+  auth/identity.ts            # Endpoints mobiles (OTP, social, refresh, logout)
+  auth/providers.ts           # SDK natifs Google / Facebook
+  auth/storage.ts             # Session dans expo-secure-store
+  auth/types.ts               # Session / réponses identity
+  auth/AuthProvider.tsx       # État de session + login/refresh/logout
   ui/theme.ts                 # palette clair/sombre, rayons, espacements
   ui/icons.tsx                # registre Icon.select (SF Symbol / Material Symbol)
-  ui/primitives.tsx           # Screen, Block, Inline, Section, AppText, AppButton, …
+  ui/primitives.tsx           # Screen, Block, Inline, Section, AppText, AppButton, AppTextField…
   data/fixtures.ts            # sujets, classement, amis, notifications, profil
 ```
 
@@ -84,6 +95,9 @@ npm run doctor     # expo-doctor
   `expo prebuild` + `gradlew assembleRelease` (arm64), APK en pre-release `apk-<run_id>`.
 - Secrets requis : `QUIZUP_GITHUB_TOKEN` (org), `ANDROID_KEYSTORE_*` (repo).
   Keystore local hors dépôt : `~/Homeware/quizup-secrets/quizup-preview.p12`.
+- Variables publiques de release : `QUIZUP_FACEBOOK_CLIENT_TOKEN` (Client Token Meta)
+  et `QUIZUP_GOOGLE_IOS_CLIENT_ID` (client OAuth iOS). Vides = boutons sociaux
+  correspondants désactivés et plugin natif non ajouté.
 - `versionCode = major*1e6 + minor*1e3 + patch` (voir `app.config.js`).
 
 ---

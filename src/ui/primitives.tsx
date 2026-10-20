@@ -6,6 +6,11 @@ import {
   Row,
   Spacer,
   Text,
+  TextInput,
+} from "@expo/ui";
+import type {
+  TextInputProps,
+  UniversalStyle,
 } from "@expo/ui";
 import type { ReactNode } from "react";
 import { ScrollView, View } from "react-native";
@@ -57,9 +62,13 @@ export function Inline({ children }: { children: ReactNode }) {
 export function Screen({
   children,
   padded = true,
+  horizontalPadding = 20,
+  bottomPadding = 104,
 }: {
   children: ReactNode;
   padded?: boolean;
+  horizontalPadding?: number;
+  bottomPadding?: number;
 }) {
   const c = useColors();
   const insets = useSafeAreaInsets();
@@ -68,10 +77,13 @@ export function Screen({
     <View style={{ flex: 1, backgroundColor: c.background }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets
         contentContainerStyle={{
-          paddingHorizontal: padded ? 20 : 0,
+          paddingHorizontal: padded ? horizontalPadding : 0,
           paddingTop: insets.top + 12,
-          paddingBottom: insets.bottom + 104,
+          paddingBottom: insets.bottom + bottomPadding,
           gap: 22,
         }}
       >
@@ -202,14 +214,106 @@ export function AppButton({
   onPress,
   variant = "filled",
   disabled,
+  style,
+  children,
 }: {
-  label: string;
+  label?: string;
   onPress?: () => void;
   variant?: "filled" | "outlined" | "text";
   disabled?: boolean;
+  style?: UniversalStyle;
+  children?: ReactNode;
 }) {
   return (
-    <Button label={label} onPress={onPress} variant={variant} disabled={disabled} />
+    <Button
+      label={label}
+      onPress={onPress}
+      variant={variant}
+      disabled={disabled}
+      style={style}
+    >
+      {children}
+    </Button>
+  );
+}
+
+/** Champ de saisie universel (SwiftUI TextField / Compose BasicTextField). */
+export function AppTextField({
+  style,
+  textStyle,
+  placeholderTextColor,
+  ...props
+}: TextInputProps) {
+  const c = useColors();
+
+  return (
+    <TextInput
+      {...props}
+      placeholderTextColor={placeholderTextColor ?? c.textMuted}
+      style={{
+        height: 50,
+        paddingHorizontal: 14,
+        backgroundColor: c.surface,
+        borderColor: c.border,
+        borderWidth: 1,
+        borderRadius: radius.md,
+        ...style,
+      }}
+      textStyle={{
+        fontSize: 16,
+        color: c.text,
+        ...textStyle,
+      }}
+    />
+  );
+}
+
+/** Bouton social avec un badge de marque (G / f) et un libellé. */
+export function AppSocialButton({
+  label,
+  badge,
+  badgeColor,
+  onPress,
+  disabled,
+  style,
+}: {
+  label: string;
+  badge: string;
+  badgeColor: string;
+  onPress?: () => void;
+  disabled?: boolean;
+  style?: UniversalStyle;
+}) {
+  const c = useColors();
+
+  return (
+    <Button
+      variant="outlined"
+      onPress={onPress}
+      disabled={disabled}
+      style={style}
+    >
+      <Row spacing={10} alignment="center">
+        <Text
+          textStyle={{
+            fontSize: 20,
+            fontWeight: "800",
+            color: badgeColor,
+          }}
+        >
+          {badge}
+        </Text>
+        <Text
+          textStyle={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: c.text,
+          }}
+        >
+          {label}
+        </Text>
+      </Row>
+    </Button>
   );
 }
 
