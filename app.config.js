@@ -1,4 +1,5 @@
 const packageJson = require("./package.json");
+const withAndroidSigning = require("./plugins/withAndroidSigning");
 
 const [major = 1, minor = 0, patch = 0] = packageJson.version
   .split(".")
@@ -32,7 +33,7 @@ const googleIosUrlScheme = googleIosClientId
  * locaux sans configuration fonctionnels (les boutons correspondants restent désactivés).
  */
 module.exports = ({ config }) => {
-  const plugins = [...(config.plugins ?? []), "expo-secure-store"];
+  const plugins = [...(config.plugins ?? []), "expo-secure-store", withAndroidSigning];
 
   if (googleIosUrlScheme) {
     plugins.push([
