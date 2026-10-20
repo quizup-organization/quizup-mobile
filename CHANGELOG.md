@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/quizup-organization/quizup-mobile/compare/v1.1.0...v1.1.1) (2026-10-20)
+
+### Bug Fixes
+
+* **mobile:** active le Client Token Facebook ([88a89ad](https://github.com/quizup-organization/quizup-mobile/commit/88a89ad1b7501cef38ba09339bf1ae95876dfb0b))
+
 ## [1.1.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.0.0...v1.1.0) (2026-10-20)
 
 ### Features
