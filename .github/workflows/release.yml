@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.github/workflows/**'
+      - '**.md'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    uses: quizup-organization/quizup-reusable-workflows/.github/workflows/mobile-release.yml@main
+    with:
+      service-name: quizup-mobile
+      android-package: fr.cnadjim.quizup
+      api-url: https://api.quizup.cnadjim.fr
+      oidc-authority: https://identity.quizup.cnadjim.fr
+      oidc-client-id: mobile
+      google-web-client-id: 270229696016-9u3916ckfcludqv77uiebgir65j3eurk.apps.googleusercontent.com
+      facebook-app-id: "2122240041993058"
+      # Valeur publique (Client Token), configurée en variable de dépôt GitHub.
+      # Vide = bouton Facebook masqué et plugin natif non ajouté.
+      facebook-client-token: ${{ vars.QUIZUP_FACEBOOK_CLIENT_TOKEN }}
+    secrets:
+      GITHUB_PASSWORD: ${{ secrets.QUIZUP_GITHUB_TOKEN }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}

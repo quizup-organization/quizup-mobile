@@ -1,0 +1,9 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    uses: quizup-organization/quizup-reusable-workflows/.github/workflows/mobile-ci.yml@main
