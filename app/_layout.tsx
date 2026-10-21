@@ -1,18 +1,26 @@
-import { Stack, useRouter, useSegments } from "expo-router";
+import {
+  DarkTheme,
+  DefaultTheme,
+  Stack,
+  ThemeProvider as NavigationThemeProvider,
+  useRouter,
+  useSegments,
+} from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
-import { useColors } from "@/ui/theme";
+import { useTheme } from "@/hooks/use-theme";
+import { ThemeProvider, useThemeSettings } from "@/providers/theme-provider";
 
 void SplashScreen.preventAutoHideAsync().catch(() => {
   // Le splash peut déjà être masqué (Fast Refresh).
 });
 
 function RootNavigator() {
-  const c = useColors();
+  const theme = useTheme();
   const { status } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -42,7 +50,7 @@ function RootNavigator() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: c.background },
+          contentStyle: { backgroundColor: theme.background },
         }}
       >
         <Stack.Screen name="(tabs)" />
@@ -57,12 +65,26 @@ function RootNavigator() {
   );
 }
 
-export default function RootLayout() {
+function RootLayoutContent() {
+  const { resolvedScheme } = useThemeSettings();
+
   return (
-    <SafeAreaProvider>
+    <NavigationThemeProvider
+      value={resolvedScheme === "dark" ? DarkTheme : DefaultTheme}
+    >
       <AuthProvider>
         <RootNavigator />
       </AuthProvider>
+    </NavigationThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <RootLayoutContent />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

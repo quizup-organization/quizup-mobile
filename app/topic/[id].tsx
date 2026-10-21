@@ -1,21 +1,21 @@
-import { Column, Icon, Row, Spacer } from "@expo/ui";
+import { Column, Row, Spacer } from "@expo/ui";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { useWindowDimensions } from "react-native";
-import { findTopic } from "@/data/fixtures";
-import { icons } from "@/ui/icons";
+
 import {
-  AppBar,
   AppButton,
   AppCard,
   AppChip,
+  AppIcon,
   AppIconTile,
   AppText,
   Block,
+  ProgressBar,
   Screen,
   Section,
-} from "@/ui/primitives";
-import { radius, useColors } from "@/ui/theme";
+} from "@/components";
+import { findTopic } from "@/data/fixtures";
+import { useContentWidth } from "@/hooks/use-content-width";
 
 const AGENDA = [
   "Questions à choix unique, 15 secondes par question",
@@ -27,11 +27,8 @@ export default function TopicDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const topic = findTopic(id);
-  const c = useColors();
-  const { width } = useWindowDimensions();
+  const contentWidth = useContentWidth();
   const [started, setStarted] = useState(false);
-
-  const contentWidth = Math.min(width - 40, 480);
 
   if (!topic) {
     return (
@@ -46,7 +43,11 @@ export default function TopicDetailScreen() {
         </Block>
         <Block>
           <Row spacing={8} alignment="center">
-            <AppButton label="Retour" variant="text" onPress={() => router.back()} />
+            <AppButton
+              label="Retour"
+              variant="text"
+              onPress={() => router.back()}
+            />
           </Row>
         </Block>
       </Screen>
@@ -57,7 +58,7 @@ export default function TopicDetailScreen() {
     <Screen>
       <Block>
         <Row spacing={8} alignment="center" onPress={() => router.back()}>
-          <Icon name={icons.back} size={18} color={c.accent} />
+          <AppIcon name="back" size={18} tone="accent" />
           <AppText variant="label" tone="accent">
             Retour
           </AppText>
@@ -65,16 +66,7 @@ export default function TopicDetailScreen() {
       </Block>
 
       <Block>
-        <Column
-          spacing={14}
-          style={{
-            padding: 18,
-            backgroundColor: c.surface,
-            borderRadius: radius.lg,
-            borderWidth: 1,
-            borderColor: c.border,
-          }}
-        >
+        <AppCard>
           <Row spacing={14} alignment="center">
             <AppIconTile
               name={topic.icon}
@@ -89,26 +81,20 @@ export default function TopicDetailScreen() {
               </AppText>
             </Column>
             <Spacer flexible />
-            <AppChip label={`${Math.round(topic.mastery * 100)} %`} icon="star" />
+            <AppChip
+              label={`${Math.round(topic.mastery * 100)} %`}
+              icon="star"
+            />
           </Row>
 
           <AppText variant="body" tone="muted">
             {topic.blurb}
           </AppText>
-        </Column>
+        </AppCard>
       </Block>
 
       <Block>
-        <Column
-          spacing={10}
-          style={{
-            padding: 16,
-            backgroundColor: c.surface,
-            borderRadius: radius.lg,
-            borderWidth: 1,
-            borderColor: c.border,
-          }}
-        >
+        <AppCard>
           <Row spacing={8} alignment="center">
             <AppText variant="label">Maîtrise</AppText>
             <Spacer flexible />
@@ -117,16 +103,16 @@ export default function TopicDetailScreen() {
             </AppText>
           </Row>
           <Row alignment="center">
-            <AppBar value={topic.mastery} width={contentWidth - 32} />
+            <ProgressBar value={topic.mastery} width={contentWidth - 30} />
           </Row>
-        </Column>
+        </AppCard>
       </Block>
 
       <Section title="Au programme">
         <Column spacing={8}>
           {AGENDA.map((item) => (
             <Row key={item} spacing={10} alignment="center">
-              <Icon name={icons.chevron} size={14} color={c.accent} />
+              <AppIcon name="chevron" size={14} tone="accent" />
               <AppText variant="caption" tone="muted">
                 {item}
               </AppText>
@@ -147,7 +133,7 @@ export default function TopicDetailScreen() {
 
       {started ? (
         <Block>
-          <AppCard tone="accent">
+          <AppCard>
             <AppText variant="heading">Partie simulée</AppText>
             <AppText variant="caption" tone="muted">
               {`5 questions · ${topic.name} — aucune donnée réelle, aucun appel réseau.`}

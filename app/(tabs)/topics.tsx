@@ -1,8 +1,8 @@
 import { Column } from "@expo/ui";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ScrollView, useWindowDimensions, View } from "react-native";
-import { categories, topics } from "@/data/fixtures";
+import { ScrollView, View } from "react-native";
+
 import {
   AppCard,
   AppChip,
@@ -11,21 +11,23 @@ import {
   Block,
   Inline,
   Screen,
-} from "@/ui/primitives";
+} from "@/components";
+import { categories, topics } from "@/data/fixtures";
+import { useContentWidth } from "@/hooks/use-content-width";
 
 export default function TopicsScreen() {
   const router = useRouter();
-  const { width } = useWindowDimensions();
+  const contentWidth = useContentWidth();
   const [category, setCategory] = useState("Tous");
 
   const visible =
     category === "Tous"
       ? topics
       : topics.filter((topic) => topic.category === category);
-  const cardWidth = Math.floor((width - 40 - 12) / 2);
+  const cardWidth = Math.floor((contentWidth - 12) / 2);
 
   return (
-    <Screen>
+    <Screen tabBar>
       <Block>
         <Column spacing={4}>
           <AppText variant="title">Sujets</AppText>
@@ -38,7 +40,7 @@ export default function TopicsScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8, paddingRight: 20 }}
+        contentContainerStyle={{ gap: 8 }}
       >
         {categories.map((item) => (
           <Inline key={item}>
@@ -54,7 +56,10 @@ export default function TopicsScreen() {
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
         {visible.map((topic) => (
           <Block key={topic.id} width={cardWidth}>
-            <AppCard onPress={() => router.push(`/topic/${topic.id}`)}>
+            <AppCard
+              width={cardWidth}
+              onPress={() => router.push(`/topic/${topic.id}`)}
+            >
               <AppIconTile
                 name={topic.icon}
                 background={topic.background}

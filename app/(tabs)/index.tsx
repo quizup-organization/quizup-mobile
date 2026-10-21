@@ -1,27 +1,26 @@
-import { Column, Icon, Row, Spacer } from "@expo/ui";
+import { Column, Row, Spacer } from "@expo/ui";
 import { useRouter } from "expo-router";
 import { ScrollView } from "react-native";
-import { dailyChallenge, leaderboard, streak, topics } from "@/data/fixtures";
-import { icons } from "@/ui/icons";
+
 import {
   AppAvatar,
   AppButton,
   AppCard,
   AppChip,
+  AppIcon,
   AppIconTile,
   AppText,
   Block,
   Screen,
   Section,
-} from "@/ui/primitives";
-import { useColors } from "@/ui/theme";
+} from "@/components";
+import { dailyChallenge, leaderboard, streak, topics } from "@/data/fixtures";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const c = useColors();
 
   return (
-    <Screen>
+    <Screen tabBar>
       <Block>
         <Column spacing={8}>
           <AppText variant="title">Bonjour Nadjim</AppText>
@@ -35,7 +34,7 @@ export default function HomeScreen() {
       </Block>
 
       <Block>
-        <AppCard tone="accent">
+        <AppCard>
           <Row spacing={12} alignment="center">
             <AppIconTile name="bolt" size={44} />
             <Column spacing={2}>
@@ -72,11 +71,14 @@ export default function HomeScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 12, paddingRight: 20 }}
+        contentContainerStyle={{ gap: 12 }}
       >
         {topics.slice(0, 4).map((topic) => (
           <Block key={topic.id} width={176}>
-            <AppCard onPress={() => router.push(`/topic/${topic.id}`)}>
+            <AppCard
+              width={176}
+              onPress={() => router.push(`/topic/${topic.id}`)}
+            >
               <AppIconTile
                 name={topic.icon}
                 background={topic.background}
@@ -118,7 +120,7 @@ export default function HomeScreen() {
               </Column>
               <Spacer flexible />
               {entry.rank === 1 ? (
-                <Icon name={icons.trophy} size={16} color={c.warning} />
+                <AppIcon name="trophy" size={16} tone="accent" />
               ) : null}
             </Row>
           ))}

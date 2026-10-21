@@ -1,30 +1,29 @@
 import { Column, Row, Spacer } from "@expo/ui";
-import { useWindowDimensions } from "react-native";
-import { useAuth } from "@/auth/AuthProvider";
-import { profile } from "@/data/fixtures";
+
 import {
   AppAvatar,
-  AppBar,
+  AppCard,
   AppChip,
   AppRow,
   AppText,
   Block,
+  ProgressBar,
   Screen,
   Section,
-} from "@/ui/primitives";
-import { radius, useColors } from "@/ui/theme";
+} from "@/components";
+import { useAuth } from "@/auth/AuthProvider";
+import { profile } from "@/data/fixtures";
+import { useContentWidth } from "@/hooks/use-content-width";
 
 export default function ProfileScreen() {
-  const { width } = useWindowDimensions();
-  const c = useColors();
+  const contentWidth = useContentWidth();
   const { session, logout } = useAuth();
 
-  const contentWidth = Math.min(width - 40, 480);
   const statWidth = Math.floor((contentWidth - 20) / 3);
   const progress = profile.xp / profile.xpToNext;
 
   return (
-    <Screen>
+    <Screen tabBar>
       <Block>
         <Column spacing={10} alignment="center">
           <AppAvatar initials={profile.initials} size={76} />
@@ -47,16 +46,7 @@ export default function ProfileScreen() {
       </Block>
 
       <Block>
-        <Column
-          spacing={10}
-          style={{
-            padding: 16,
-            backgroundColor: c.surface,
-            borderRadius: radius.lg,
-            borderWidth: 1,
-            borderColor: c.border,
-          }}
-        >
+        <AppCard>
           <Row spacing={8} alignment="center">
             <AppText variant="label">Progression</AppText>
             <Spacer flexible />
@@ -65,34 +55,23 @@ export default function ProfileScreen() {
             </AppText>
           </Row>
           <Row alignment="center">
-            <AppBar value={progress} width={contentWidth - 32} />
+            <ProgressBar value={progress} width={contentWidth - 30} />
           </Row>
           <AppText variant="caption" tone="muted">
             {`Encore ${(profile.xpToNext - profile.xp).toLocaleString("fr-FR")} XP pour le niveau ${profile.level + 1}.`}
           </AppText>
-        </Column>
+        </AppCard>
       </Block>
 
       <Block>
         <Row spacing={10}>
           {profile.stats.map((stat) => (
-            <Column
-              key={stat.label}
-              spacing={4}
-              style={{
-                width: statWidth,
-                padding: 14,
-                backgroundColor: c.surface,
-                borderRadius: radius.lg,
-                borderWidth: 1,
-                borderColor: c.border,
-              }}
-            >
+            <AppCard key={stat.label} width={statWidth}>
               <AppText variant="heading">{stat.value}</AppText>
               <AppText variant="caption" tone="muted">
                 {stat.label}
               </AppText>
-            </Column>
+            </AppCard>
           ))}
         </Row>
       </Block>
@@ -107,9 +86,24 @@ export default function ProfileScreen() {
 
       <Section title="Réglages">
         <Column spacing={2}>
-          <AppRow icon="settings" title="Préférences" subtitle="Thème, langue, notifications" onPress={() => {}} />
-          <AppRow icon="medal" title="Récompenses" subtitle="Titres et badges obtenus" onPress={() => {}} />
-          <AppRow icon="trend" title="Statistiques" subtitle="Historique de tes parties" onPress={() => {}} />
+          <AppRow
+            icon="settings"
+            title="Préférences"
+            subtitle="Thème, langue, notifications"
+            onPress={() => {}}
+          />
+          <AppRow
+            icon="medal"
+            title="Récompenses"
+            subtitle="Titres et badges obtenus"
+            onPress={() => {}}
+          />
+          <AppRow
+            icon="trend"
+            title="Statistiques"
+            subtitle="Historique de tes parties"
+            onPress={() => {}}
+          />
         </Column>
       </Section>
 

@@ -1,22 +1,23 @@
 import { Column, Row, Spacer } from "@expo/ui";
 import { ScrollView } from "react-native";
-import { activity, friends, topics } from "@/data/fixtures";
+
 import {
   AppAvatar,
   AppCard,
   AppChip,
   AppIconTile,
-  AppText,
   AppRow,
+  AppText,
   Block,
   Inline,
   Screen,
   Section,
-} from "@/ui/primitives";
+} from "@/components";
+import { activity, friends, topics } from "@/data/fixtures";
 
 export default function SocialScreen() {
   return (
-    <Screen>
+    <Screen tabBar>
       <Block>
         <Column spacing={4}>
           <AppText variant="title">Social</AppText>
@@ -29,7 +30,7 @@ export default function SocialScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8, paddingRight: 20 }}
+        contentContainerStyle={{ gap: 8 }}
       >
         {friends.slice(0, 4).map((friend) => (
           <Inline key={friend.id}>
@@ -44,7 +45,12 @@ export default function SocialScreen() {
       <Section title="Amis" action={`${friends.length} joueurs`}>
         <Column spacing={2}>
           {friends.map((friend) => (
-            <Row key={friend.id} spacing={12} alignment="center" style={{ paddingVertical: 8 }}>
+            <Row
+              key={friend.id}
+              spacing={12}
+              alignment="center"
+              style={{ paddingVertical: 8 }}
+            >
               <AppAvatar initials={friend.initials} size={40} />
               <Column spacing={2}>
                 <AppText variant="label">{friend.name}</AppText>
@@ -71,7 +77,7 @@ export default function SocialScreen() {
                   </AppText>
                 </Column>
                 <Spacer flexible />
-                <AppText variant="caption" tone="success">
+                <AppText variant="caption" tone="accent">
                   {item.xp}
                 </AppText>
               </Row>

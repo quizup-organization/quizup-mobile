@@ -1,4 +1,4 @@
-import type { IconKey } from "@/ui/icons";
+import type { IconKey } from "@/components/icons";
 
 /**
  * Données factices — aucune API, aucun branchement.

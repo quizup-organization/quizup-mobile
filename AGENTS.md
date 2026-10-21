@@ -35,22 +35,28 @@ web, administration.
 
 ```
 app/
-  _layout.tsx                 # Stack racine + AuthProvider + gating + StatusBar
+  _layout.tsx                 # Stack racine + ThemeProvider + AuthProvider + gating
   login.tsx                   # Login OTP + Google + Facebook (Expo UI universel)
-  (tabs)/_layout.tsx          # onglets natifs
+  (tabs)/_layout.tsx          # onglets natifs (tint du thème)
   (tabs)/{index,topics,social,notifications,profile}.tsx
   topic/[id].tsx              # fiche sujet (hors onglets)
 src/
-  auth/config.ts              # URLs identity + IDs publics Google/Facebook
-  auth/errors.ts              # AuthError / AuthCancelledError
-  auth/identity.ts            # Endpoints mobiles (OTP, social, refresh, logout)
-  auth/providers.ts           # SDK natifs Google / Facebook
-  auth/storage.ts             # Session dans expo-secure-store
-  auth/types.ts               # Session / réponses identity
-  auth/AuthProvider.tsx       # État de session + login/refresh/logout
-  ui/theme.ts                 # palette clair/sombre, rayons, espacements
-  ui/icons.tsx                # registre Icon.select (SF Symbol / Material Symbol)
-  ui/primitives.tsx           # Screen, Block, Inline, Section, AppText, AppButton, AppTextField…
+  auth/                       # session, providers natifs, endpoints identity
+  components/
+    text.tsx                  # AppText (variantes typographiques internes)
+    block.tsx inline.tsx      # ponts Host Expo UI
+    screen.tsx section.tsx    # structure d'écran / sections
+    card.tsx chip.tsx avatar.tsx progress-bar.tsx dot.tsx icon-tile.tsx
+    row.tsx button.tsx text-field.tsx social-button.tsx icon.tsx
+    icons.tsx                 # registre Icon.select (SF Symbol / Material Symbol)
+    index.ts                  # barrel : les écrans importent depuis "@/components"
+  constants/Colors.ts         # palette du template expo-template-tabs
+  hooks/
+    use-color-scheme.ts       # + use-color-scheme.web.ts
+    use-theme.ts              # Colors du schéma résolu
+    use-theme-color.ts        # résolution + surcharges light/dark
+    use-content-width.ts      # largeur de contenu bornée (480)
+  providers/theme-provider.tsx # schéma + seed d'accent (préparation du picker)
   data/fixtures.ts            # sujets, classement, amis, notifications, profil
 ```
 
@@ -65,12 +71,25 @@ src/
    `borderWidth`, `width`/`height`.
 3. React Native ne sert qu'à la **structure** : `ScrollView`, `View`, `useWindowDimensions`,
    safe areas. Jamais de style visuel RN.
-4. Un seul design system : les couleurs passent par `useColors()` (`src/ui/theme.ts`).
-5. `Host` reçoit `seedColor` + `colorScheme` pour aligner les contrôles natifs.
-6. Contraintes connues : `List` n'est **pas lazy** (garder `FlatList` pour les longues
+4. **Couleurs = `src/constants/Colors.ts` uniquement** (palette du template
+   `expo-template-tabs`) : `text`, `background`, `tint`, `tabIconDefault`,
+   `tabIconSelected`. Aucune palette parallèle, aucun token `accent`/`success`/`warning`/
+   `danger`. Les valeurs secondaires reprennent celles du template :
+   `rgba(0,0,0,0.8)`/`rgba(255,255,255,0.8)` (texte), `rgba(0,0,0,0.05)`/
+   `rgba(255,255,255,0.05)` (cartes), `#eee`/`rgba(255,255,255,0.1)` (contrôles,
+   séparateurs). Exceptions : couleurs de marque des fournisseurs (badges Google/Facebook)
+   et couleurs de contenu des fixtures.
+5. **Aucun token `space` ni `radius`** : les valeurs de mise en page vivent dans les
+   primitives (`src/components/*.tsx`), jamais dans les écrans.
+6. `Host` reçoit `seedColor` (accent du `ThemeProvider`) + `colorScheme` (schéma résolu).
+7. **Un composant par fichier** dans `src/components/`, exporté par le barrel `index.ts`.
+8. Contraintes connues : `List` n'est **pas lazy** (garder `FlatList` pour les longues
    listes), `Icon` ne rend pas sur le web, `matchContents` est figé au montage.
-7. **SwiftUI est iOS-only** : sur Android, les composants universels rendent du Compose.
+9. **SwiftUI est iOS-only** : sur Android, les composants universels rendent du Compose.
    Ne jamais importer `@expo/ui/swift-ui` dans un fichier partagé.
+10. Le `ThemeProvider` applicatif porte le schéma (clair/sombre/système) et le seed
+    d'accent : c'est le point d'entrée du futur sélecteur de thème (WhatsApp-like),
+    pas encore exposé dans l'UI.
 
 ---
 

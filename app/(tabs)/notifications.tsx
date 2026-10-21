@@ -1,5 +1,5 @@
 import { Column, Row, Spacer } from "@expo/ui";
-import { notifications } from "@/data/fixtures";
+
 import {
   AppDot,
   AppIconTile,
@@ -7,13 +7,14 @@ import {
   Block,
   Screen,
   Section,
-} from "@/ui/primitives";
+} from "@/components";
+import { notifications } from "@/data/fixtures";
 
 export default function NotificationsScreen() {
   const unread = notifications.filter((item) => item.unread).length;
 
   return (
-    <Screen>
+    <Screen tabBar>
       <Block>
         <Column spacing={4}>
           <AppText variant="title">Alertes</AppText>

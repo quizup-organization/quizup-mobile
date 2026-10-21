@@ -1,16 +1,8 @@
-import { Column, Row, Spacer, Text } from "@expo/ui";
+import { Column, Row, Spacer } from "@expo/ui";
 import type { TextInputRef } from "@expo/ui";
 import * as Linking from "expo-linking";
 import { useEffect, useRef, useState } from "react";
-import { useWindowDimensions } from "react-native";
 
-import { isFacebookConfigured, isGoogleConfigured } from "@/auth/config";
-import {
-  AuthCancelledError,
-  AuthError,
-  isFacebookEmailMissing,
-} from "@/auth/errors";
-import { useAuth } from "@/auth/AuthProvider";
 import {
   AppButton,
   AppSocialButton,
@@ -18,11 +10,19 @@ import {
   AppTextField,
   Block,
   Screen,
-} from "@/ui/primitives";
-import { useColors } from "@/ui/theme";
+} from "@/components";
+import { isFacebookConfigured, isGoogleConfigured } from "@/auth/config";
+import {
+  AuthCancelledError,
+  AuthError,
+  isFacebookEmailMissing,
+} from "@/auth/errors";
+import { useAuth } from "@/auth/AuthProvider";
+import { useContentWidth } from "@/hooks/use-content-width";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RESEND_DELAY_SECONDS = 60;
+const FORM_MAX_WIDTH = 420;
 
 type Step = "email" | "code";
 type Pending = "request" | "code" | "google" | "facebook" | null;
@@ -35,8 +35,8 @@ function messageFor(error: unknown): string {
 }
 
 export default function LoginScreen() {
-  const c = useColors();
-  const { width } = useWindowDimensions();
+  const contentWidth = useContentWidth();
+  const formWidth = Math.min(contentWidth, FORM_MAX_WIDTH);
   const {
     requestLoginCode,
     loginWithCode,
@@ -54,8 +54,6 @@ export default function LoginScreen() {
   const emailRef = useRef<TextInputRef>(null);
   const codeRef = useRef<TextInputRef>(null);
 
-  const formWidth = Math.min(width - 40, 420);
-  const horizontalPadding = Math.max(20, (width - formWidth) / 2);
   const isBusy = pending !== null;
   const isEmailValid = EMAIL_PATTERN.test(email.trim());
   const isCodeValid = code.length === 6;
@@ -196,11 +194,11 @@ export default function LoginScreen() {
     pending === "facebook" ? "Connexion..." : "Continuer avec Facebook";
 
   return (
-    <Screen horizontalPadding={horizontalPadding} bottomPadding={24}>
+    <Screen>
       <Block width={formWidth}>
         <Column spacing={6} alignment="center">
           <AppText variant="display">QuizUp</AppText>
-          <AppText variant="body" tone="muted" align="center">
+          <AppText variant="body" tone="muted" align="center" width={formWidth}>
             Connecte-toi pour jouer
           </AppText>
         </Column>
@@ -228,12 +226,12 @@ export default function LoginScreen() {
                 label={isRequestingCode ? "Envoi..." : "Recevoir un code"}
                 onPress={handleRequestCode}
                 disabled={!isEmailValid || isBusy}
-                style={{ width: formWidth, height: 50 }}
+                style={{ width: formWidth }}
               />
             </>
           ) : (
             <>
-              <AppText variant="caption" tone="muted" align="center">
+              <AppText variant="caption" tone="muted" align="center" width={formWidth}>
                 {`Code envoyé à ${email}`}
               </AppText>
               <AppTextField
@@ -249,7 +247,7 @@ export default function LoginScreen() {
                   setCode(value.replace(/\D/g, "").slice(0, 6))
                 }
                 editable={!isBusy}
-                style={{ width: formWidth, height: 60 }}
+                style={{ width: formWidth }}
                 textStyle={{
                   fontSize: 28,
                   fontWeight: "700",
@@ -260,7 +258,7 @@ export default function LoginScreen() {
                 label={isSubmittingCode ? "Connexion..." : "Se connecter"}
                 onPress={handleLoginCode}
                 disabled={!isCodeValid || isBusy}
-                style={{ width: formWidth, height: 50 }}
+                style={{ width: formWidth }}
               />
               <Row spacing={8} alignment="center" style={{ width: formWidth }}>
                 <AppButton
@@ -290,7 +288,7 @@ export default function LoginScreen() {
 
       <Block width={formWidth}>
         <Column spacing={12}>
-          <AppText variant="caption" tone="muted" align="center">
+          <AppText variant="caption" tone="muted" align="center" width={formWidth}>
             ou continuer avec
           </AppText>
           <AppSocialButton
@@ -299,7 +297,7 @@ export default function LoginScreen() {
             label={googleLabel}
             onPress={handleGoogle}
             disabled={isBusy || !isGoogleConfigured}
-            style={{ width: formWidth, height: 50 }}
+            style={{ width: formWidth }}
           />
           <AppSocialButton
             badge="f"
@@ -307,10 +305,10 @@ export default function LoginScreen() {
             label={facebookLabel}
             onPress={handleFacebook}
             disabled={isBusy || !isFacebookConfigured}
-            style={{ width: formWidth, height: 50 }}
+            style={{ width: formWidth }}
           />
           {__DEV__ && (!isGoogleConfigured || !isFacebookConfigured) ? (
-            <AppText variant="caption" tone="muted" align="center">
+            <AppText variant="caption" tone="muted" align="center" width={formWidth}>
               Google/Facebook non configurés dans ce build.
             </AppText>
           ) : null}
@@ -319,43 +317,37 @@ export default function LoginScreen() {
 
       {error ? (
         <Block width={formWidth}>
-          <Text
-            textStyle={{
-              fontSize: 13,
-              color: c.danger,
-              textAlign: "center",
-            }}
-          >
+          <AppText variant="caption" align="center" width={formWidth}>
             {error}
-          </Text>
+          </AppText>
         </Block>
       ) : null}
 
       <Block width={formWidth}>
-        <Column spacing={8} alignment="center">
-          <Row spacing={18} alignment="center">
-            <Text
-              onPress={() => {
-                void Linking.openURL(
-                  "https://app.quizup.cnadjim.fr/privacy.html",
-                );
-              }}
-              textStyle={{ fontSize: 13, color: c.textMuted }}
-            >
-              Confidentialité
-            </Text>
-            <Text
-              onPress={() => {
-                void Linking.openURL(
-                  "https://app.quizup.cnadjim.fr/terms.html",
-                );
-              }}
-              textStyle={{ fontSize: 13, color: c.textMuted }}
-            >
-              Conditions
-            </Text>
-          </Row>
-        </Column>
+        <Row spacing={18} alignment="center" style={{ width: formWidth }}>
+          <Spacer flexible />
+          <AppText
+            variant="caption"
+            tone="muted"
+            onPress={() => {
+              void Linking.openURL(
+                "https://app.quizup.cnadjim.fr/privacy.html",
+              );
+            }}
+          >
+            Confidentialité
+          </AppText>
+          <AppText
+            variant="caption"
+            tone="muted"
+            onPress={() => {
+              void Linking.openURL("https://app.quizup.cnadjim.fr/terms.html");
+            }}
+          >
+            Conditions
+          </AppText>
+          <Spacer flexible />
+        </Row>
       </Block>
     </Screen>
   );
