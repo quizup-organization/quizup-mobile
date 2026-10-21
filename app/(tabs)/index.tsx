@@ -62,6 +62,7 @@ export default function HomeScreen() {
           renderItem={(topic, width) => (
             <AppCard
               width={width}
+              accessibilityLabel={`Sujet ${topic.name}`}
               onPress={() => router.push(`/topic/${topic.id}`)}
             >
               <AppIconTile

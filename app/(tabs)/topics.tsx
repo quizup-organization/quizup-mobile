@@ -50,6 +50,7 @@ export default function TopicsScreen() {
         renderItem={(topic, width) => (
           <AppCard
             width={width}
+            accessibilityLabel={`Sujet ${topic.name}`}
             onPress={() => router.push(`/topic/${topic.id}`)}
           >
             <AppIconTile

@@ -1,5 +1,6 @@
 import { Icon, Row, Spacer } from "@expo/ui";
 
+import { decorativeModifiers } from "@/components/fragments/accessibility";
 import { icons, type IconKey } from "@/components/fragments/icons";
 import { useNativeColors } from "@/theme";
 
@@ -20,6 +21,7 @@ export function AppIconTile({
   return (
     <Row
       alignment="center"
+      modifiers={decorativeModifiers()}
       style={{
         width: size,
         height: size,

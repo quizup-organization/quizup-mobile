@@ -1,5 +1,6 @@
 import { Row, Spacer, Text } from "@expo/ui";
 
+import { decorativeModifiers } from "@/components/fragments/accessibility";
 import { useNativeColors } from "@/theme";
 
 export function AppAvatar({
@@ -14,6 +15,7 @@ export function AppAvatar({
   return (
     <Row
       alignment="center"
+      modifiers={decorativeModifiers()}
       style={{
         width: size,
         height: size,

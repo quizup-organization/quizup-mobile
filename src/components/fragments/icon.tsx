@@ -1,5 +1,6 @@
 import { Icon } from "@expo/ui";
 
+import { decorativeModifiers } from "@/components/fragments/accessibility";
 import { icons, type IconKey } from "@/components/fragments/icons";
 import { useNativeColors } from "@/theme";
 
@@ -26,5 +27,12 @@ export function AppIcon({
           ? colors.danger
           : colors.text;
 
-  return <Icon name={icons[name]} size={size} color={color ?? resolved} />;
+  return (
+    <Icon
+      name={icons[name]}
+      size={size}
+      color={color ?? resolved}
+      modifiers={decorativeModifiers()}
+    />
+  );
 }

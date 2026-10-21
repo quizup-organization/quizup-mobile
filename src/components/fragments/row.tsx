@@ -1,5 +1,6 @@
 import { Column, Row, Spacer } from "@expo/ui";
 
+import { interactiveModifiers } from "@/components/fragments/accessibility";
 import { AppIcon } from "@/components/fragments/icon";
 import { AppIconTile } from "@/components/fragments/icon-tile";
 import type { IconKey } from "@/components/fragments/icons";
@@ -14,6 +15,7 @@ export function AppRow({
   onPress,
   tileBackground,
   tileColor,
+  accessibilityLabel,
 }: {
   icon?: IconKey;
   title: string;
@@ -22,12 +24,18 @@ export function AppRow({
   onPress?: () => void;
   tileBackground?: string;
   tileColor?: string;
+  accessibilityLabel?: string;
 }) {
+  const label =
+    accessibilityLabel ??
+    [title, subtitle, trailing].filter(Boolean).join(", ");
+
   return (
     <Row
       spacing={12}
       alignment="center"
       onPress={onPress}
+      modifiers={onPress ? interactiveModifiers({ label }) : undefined}
       style={{ paddingVertical: 8 }}
     >
       {icon ? (

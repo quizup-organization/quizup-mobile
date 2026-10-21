@@ -1,5 +1,6 @@
 import { Column, Row } from "@expo/ui";
 
+import { progressModifiers } from "@/components/fragments/accessibility";
 import { useScreenWidth } from "@/components/screen";
 import { useNativeColors } from "@/theme";
 
@@ -10,20 +11,21 @@ const CARD_PADDING = 15;
 export function ProgressBar({
   value,
   width,
+  label = "Progression",
 }: {
   value: number;
   width?: number;
+  label?: string;
 }) {
   const colors = useNativeColors();
   const screenWidth = useScreenWidth();
   const total = width ?? screenWidth - CARD_PADDING * 2;
-  const filled = Math.max(
-    4,
-    Math.round(total * Math.min(1, Math.max(0, value))),
-  );
+  const safeValue = Math.min(1, Math.max(0, value));
+  const filled = Math.max(4, Math.round(total * safeValue));
 
   return (
     <Row
+      modifiers={progressModifiers(label, Math.round(safeValue * 100))}
       style={{
         width: total,
         height: 8,

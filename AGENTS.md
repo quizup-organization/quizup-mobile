@@ -56,6 +56,8 @@ src/
       text.tsx card.tsx chip.tsx avatar.tsx progress-bar.tsx dot.tsx
       icon-tile.tsx icon.tsx icons.tsx row.tsx
       button.tsx text-field.tsx social-button.tsx
+      text-modifiers.ts            # styles natifs iOS (+ .android/.web)
+      accessibility.ts             # labels/traits iOS (+ .android/.web)
     index.ts                  # barrel unique : les écrans importent depuis "@/components"
   hooks/
     use-color-scheme.ts       # + use-color-scheme.web.ts
@@ -95,11 +97,17 @@ src/
    `seedColor` + `colorScheme` du `ThemeProvider`. Ne jamais figer leurs couleurs.
 7. `ThemeProvider` porte le schéma (clair/sombre/système) et le `seed` optionnel :
    point d'entrée du futur sélecteur de thème (WhatsApp-like), pas encore exposé.
-8. **Un composant par fichier** dans `components/`, exporté par le barrel `index.ts`.
-9. Contraintes connues : `List` n'est **pas lazy** (garder `FlatList` pour les longues
-   listes), `Icon` ne rend pas sur le web, `matchContents` est figé au montage.
-10. **SwiftUI est iOS-only** : sur Android, les composants universels rendent du Compose.
-    Ne jamais importer `@expo/ui/swift-ui` dans un fichier partagé.
+8. **Accessibilité / Dynamic Type** : `AppText` utilise les styles natifs iOS
+   (`text-modifiers.ts`) et les `sp` Android ; ne jamais fixer de `fontSize` hors
+   `text.tsx`. Les composites interactifs (`AppCard`, `AppChip`, `AppRow`) exigent
+   un `accessibilityLabel` ; les éléments décoratifs passent par
+   `accessibility.ts`. Tester VoiceOver/TalkBack, Bold Text et Button Shapes.
+9. **Un composant par fichier** dans `components/`, exporté par le barrel `index.ts`.
+10. Contraintes connues : `List` n'est **pas lazy** (garder `FlatList` pour les longues
+    listes), `Icon` ne rend pas sur le web, `matchContents` est figé au montage.
+11. **SwiftUI est iOS-only** : sur Android, les composants universels rendent du Compose.
+    Ne jamais importer `@expo/ui/swift-ui` dans un fichier partagé ; les fichiers
+    `*.ts` de `fragments/` qui l'importent ont un override `.android.ts`/`.web.ts`.
 
 ---
 
