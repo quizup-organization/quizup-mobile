@@ -11,7 +11,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { AuthProvider, useAuth } from "@/auth/AuthProvider";
+import { SessionBootstrap, useAuthStatus } from "@/features/auth";
+import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider, useThemeSettings } from "@/providers/theme-provider";
 import { useNativeColors } from "@/theme";
 
@@ -21,7 +22,7 @@ void SplashScreen.preventAutoHideAsync().catch(() => {
 
 function RootNavigator() {
   const colors = useNativeColors();
-  const { status } = useAuth();
+  const status = useAuthStatus();
   const segments = useSegments();
   const router = useRouter();
 
@@ -72,9 +73,7 @@ function RootLayoutContent() {
     <NavigationThemeProvider
       value={resolvedScheme === "dark" ? DarkTheme : DefaultTheme}
     >
-      <AuthProvider>
-        <RootNavigator />
-      </AuthProvider>
+      <RootNavigator />
     </NavigationThemeProvider>
   );
 }
@@ -83,7 +82,11 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <RootLayoutContent />
+        <QueryProvider>
+          <SessionBootstrap>
+            <RootLayoutContent />
+          </SessionBootstrap>
+        </QueryProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

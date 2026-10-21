@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-import type { Session } from "./types";
+import type { Session } from "@/features/auth/domain/session";
 
 const SESSION_KEY = "quizup.session.v1";
 

@@ -1,11 +1,11 @@
-import { authConfig } from "./config";
-import { AuthError } from "./errors";
+import { config } from "@/lib/config";
+import { AuthError } from "@/features/auth/domain/errors";
 import type {
   FacebookCredentials,
   LoginResponse,
   ProblemDetail,
   Session,
-} from "./types";
+} from "@/features/auth/domain/session";
 
 const JSON_HEADERS = {
   Accept: "application/json",
@@ -30,7 +30,7 @@ async function request(
 ): Promise<Response> {
   let response: Response;
   try {
-    response = await fetch(`${authConfig.identityUrl}${path}`, init);
+    response = await fetch(`${config.identityUrl}${path}`, init);
   } catch {
     throw new AuthError(
       0,
@@ -141,7 +141,7 @@ export async function loginWithFacebook(
 export async function refreshSession(session: Session): Promise<Session> {
   const body = new URLSearchParams({
     grant_type: "refresh_token",
-    client_id: authConfig.mobileClientId,
+    client_id: config.mobileClientId,
     refresh_token: session.refreshToken,
   });
 

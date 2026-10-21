@@ -1,9 +1,9 @@
 # AGENTS.md — quizup-mobile
 
-> Application mobile **Expo SDK 57 + Expo UI (universal)**. L'**authentification
-> native est branchée** (OTP email, Google, Facebook) ; le reste de l'interface
-> utilise encore des **données factices locales**. Objectif : valider l'interface
-> native (SwiftUI sur iOS, Material 3 sur Android) tout en préparant le rebranchement BFF.
+> Application mobile **Expo SDK 57 + Expo UI universal**. Phase actuelle : **écrans
+> alimentés par des mocks typés** (auth démo incluse), avant le branchement BFF.
+> L'objectif est de valider tous les écrans sans aucun appel réseau, puis de remplacer
+> les services mockés par le client BFF sans toucher aux écrans.
 
 ---
 
@@ -12,102 +12,108 @@
 Application mobile QuizUp :
 
 - 5 onglets natifs : **Accueil · Sujets · Social · Alertes · Profil**.
-- Fiche sujet (`/topic/[id]`) et partie « démo » simulée.
-- **Login** (`/login`) : OTP email, Google natif et Facebook natif ; session
-  QuizUp persistée dans `expo-secure-store` (access + refresh tokens).
-- Les écrans métier restent alimentés par `src/data/fixtures.ts`.
+- Fiche sujet (`/topic/[id]`).
+- **Login** OTP / Google / Facebook ; en mode démo, une session factice est créée.
+- Données mockées tant que le BFF n'est pas branché (voir § 3.11).
 
-Hors périmètre pour l'instant : BFF métier, duel réel, notifications temps réel,
-web, administration.
+Hors périmètre immédiat : rooms/duel/arène, temps réel STOMP, WebSocket, upload média,
+rédaction de questions, push OS, i18n complète.
 
 ---
 
 ## 2. Stack
 
 - **Expo SDK 57**, React Native 0.86, **expo-router** (`unstable-native-tabs`).
-- **`@expo/ui` (universal)** comme unique design system : les mêmes composants rendent
-  SwiftUI sur iOS et Jetpack Compose (Material 3) sur Android.
-- **Un seul `Host` par écran**, porté par `Screen` : c'est la seule frontière
-  entre l'arbre React Native et l'arbre natif.
-- **Thème natif** : aucune palette. `useNativeColors()` résout les rôles vers
-  `PlatformColor` (iOS), `useMaterialColors` (Android) et les couleurs système CSS (web).
-- `@expo/material-symbols` pour les icônes Android (SF Symbols côté iOS).
-- **Police système** (SF Pro / Roboto). Aucune police custom, aucun token web.
-- Aucun design system JS : ni HeroUI, ni NativeWind/Uniwind, ni Tailwind, ni `className`.
+- **`@expo/ui` (universal)** comme unique design system : SwiftUI sur iOS, Compose
+  (Material 3) sur Android.
+- **Un seul `Host` par écran**, porté par `Screen` : seule frontière entre l'arbre
+  React Native et l'arbre natif.
+- **Thème natif** : aucune palette. `useNativeColors()` → `PlatformColor` (iOS),
+  `useMaterialColors` (Android), couleurs système CSS (web).
+- **TanStack Query** pour l'état serveur, **Zustand** pour l'état client partagé
+  (session/auth), **Zod** pour les schémas de formulaire.
+- Architecture feature-based alignée sur `quizup-web` :
+  `domain` (types + règles pures) → `lib` (services) → `hooks` (React Query) →
+  `pages`/`components`.
+- Police système (SF Pro / Roboto). Aucun design system JS, aucun `className`.
 
 ```
 app/
-  _layout.tsx                 # Stack racine + ThemeProvider + AuthProvider + gating
-  login.tsx                   # Login OTP + Google + Facebook
+  _layout.tsx                 # providers + gating (routes minces)
+  login.tsx                   # → features/auth/pages/login-page
   (tabs)/_layout.tsx          # onglets natifs (accent du thème)
   (tabs)/{index,topics,social,notifications,profile}.tsx
-  topic/[id].tsx              # fiche sujet (hors onglets)
+  topic/[id].tsx              # → features/topic/pages/topic-page
 src/
-  auth/                       # session, providers natifs, endpoints identity
-  components/
-    screen.tsx                # UNIQUE Host + ScrollView RN + contexte de largeur
-    layout/
-      stack.tsx               # Row / Column / Spacer (fragments Expo UI)
-      page-header.tsx         # en-tête d'écran
-      section.tsx             # section titrée
-      carousel.tsx            # ScrollView native horizontale
-      grid.tsx                # grille native (lignes de Row)
-    fragments/
-      text.tsx card.tsx chip.tsx avatar.tsx progress-bar.tsx dot.tsx
-      icon-tile.tsx icon.tsx icons.tsx row.tsx
-      button.tsx text-field.tsx social-button.tsx
-      text-modifiers.ts            # styles natifs iOS (+ .android/.web)
-      accessibility.ts             # labels/traits iOS (+ .android/.web)
-    index.ts                  # barrel unique : les écrans importent depuis "@/components"
-  hooks/
-    use-color-scheme.ts       # + use-color-scheme.web.ts
-    use-content-width.ts      # largeur de contenu bornée (480)
-  providers/theme-provider.tsx # schéma + seed optionnel (préparation du picker)
-  theme/
-    types.ts                  # contrat sémantique (aucune valeur)
-    native-colors.ts          # iOS PlatformColor + web couleurs système
-    native-colors.android.ts  # Material 3 (useMaterialColors)
-    index.ts                  # useNativeColors()
-  data/fixtures.ts            # sujets, classement, amis, notifications, profil
+  lib/                        # infrastructure uniquement
+    config.ts                 # URLs, modes mock/identity/api, scénarios
+    query-client.ts query-keys.ts session.ts
+  shared/
+    types/api.ts              # Page, ApiError
+    components/               # LoadingState, ErrorState, EmptyState
+    utils/                    # format, pagination
+  features/
+    auth/
+      domain/{session,errors,gateway}.ts
+      lib/{gateway,identity,mock-gateway,providers,storage}.ts
+      stores/use-session-store.ts
+      hooks/use-auth.ts
+      components/session-bootstrap.tsx
+      pages/login-page.tsx
+      schemas.ts index.ts
+    home/                     # domain, lib, hooks, pages
+    topics/                   # catalogue : domain, lib, hooks, pages, components
+    topic/                    # fiche sujet : hooks, pages
+    player/                   # domain, lib, hooks, components (PlayerRow)
+    social/                   # hooks, pages (annuaire)
+    profile/                  # domain, lib, hooks, pages
+    notifications/            # domain, lib, hooks, pages, components
+  mocks/                      # db typée + scénarios (temporaire, phase démo)
+  components/                 # design system Expo UI
+    screen.tsx                # UNIQUE Host + ScrollView RN + refresh + largeur
+    layout/                   # PageHeader, Section, Carousel, Grid, Row/Column/Spacer
+    fragments/                # Text, Button, Card, Chip, Avatar, Switch…
+  providers/                  # QueryProvider, ThemeProvider
+  theme/                      # couleurs natives
 ```
 
 ---
 
-## 3. Règles UI (à respecter impérativement)
+## 3. Règles (à respecter impérativement)
 
 1. **`Screen` est l'unique `Host`** : un seul pont natif par écran. Ne jamais
-   instancier de `Host` ailleurs (`Block`/`Inline` n'existent plus).
+   instancier de `Host` ailleurs.
 2. **Tout le contenu d'un écran est natif** : `PageHeader`, `Section`, `Carousel`,
    `Grid`, `Row`, `Column`, `Spacer` et les fragments. Aucune vue RN dans le Host.
 3. **`app/` n'importe ni `react-native` ni `@expo/ui`** : uniquement `@/components`,
-   `@/auth`, `@/data`, `@/hooks`, `@/providers`, `@/theme`.
-   Garde : `npm run check:boundaries` (job CI `boundaries`).
-4. **Aucune palette, aucun hex dans `src/`** (hors couleurs de contenu des fixtures
-   et badges de marque Google/Facebook). `useNativeColors()` uniquement :
-   - iOS : `PlatformColor("systemBackground" | "secondarySystemBackground" |
-     "tertiarySystemFill" | "label" | "secondaryLabel" | "tintColor" | "white" |
-     "systemRed")` ;
-   - Android : `useMaterialColors({ colorScheme, seedColor })` (Material You si
-     pas de seed) ;
-   - web : `Canvas`, `CanvasText`, `GrayText`, `ButtonFace`, `Highlight`,
-     `HighlightText`.
-5. **Aucun token `space` ni `radius`** : les valeurs de layout vivent dans
-   `Screen`/`layout/`/`fragments/`, jamais dans les écrans.
-6. **Les contrôles natifs** (`Button`, `TextField`, onglets) héritent du Host :
-   `seedColor` + `colorScheme` du `ThemeProvider`. Ne jamais figer leurs couleurs.
-7. `ThemeProvider` porte le schéma (clair/sombre/système) et le `seed` optionnel :
-   point d'entrée du futur sélecteur de thème (WhatsApp-like), pas encore exposé.
-8. **Accessibilité / Dynamic Type** : `AppText` utilise les styles natifs iOS
-   (`text-modifiers.ts`) et les `sp` Android ; ne jamais fixer de `fontSize` hors
-   `text.tsx`. Les composites interactifs (`AppCard`, `AppChip`, `AppRow`) exigent
-   un `accessibilityLabel` ; les éléments décoratifs passent par
-   `accessibility.ts`. Tester VoiceOver/TalkBack, Bold Text et Button Shapes.
-9. **Un composant par fichier** dans `components/`, exporté par le barrel `index.ts`.
-10. Contraintes connues : `List` n'est **pas lazy** (garder `FlatList` pour les longues
-    listes), `Icon` ne rend pas sur le web, `matchContents` est figé au montage.
-11. **SwiftUI est iOS-only** : sur Android, les composants universels rendent du Compose.
-    Ne jamais importer `@expo/ui/swift-ui` dans un fichier partagé ; les fichiers
-    `*.ts` de `fragments/` qui l'importent ont un override `.android.ts`/`.web.ts`.
+   `@/features`, `@/lib`, `@/shared`, `@/providers`, `@/theme`.
+   Garde : `npm run check:boundaries`.
+4. **Aucune palette, aucun hex dans `src/`** (hors couleurs de contenu des mocks et
+   badges de marque Google/Facebook). `useNativeColors()` uniquement.
+5. **Aucun token `space`/`radius`** : les valeurs de layout vivent dans
+   `Screen`/`layout`/`fragments`, jamais dans les pages.
+6. **Les contrôles natifs** (`Button`, `TextField`, onglets, `Switch`) héritent du
+   Host (`seedColor` + `colorScheme`) : ne jamais figer leurs couleurs.
+7. `ThemeProvider` porte le schéma et le `seed` optionnel (futur sélecteur de thème).
+8. **Accessibilité / Dynamic Type** : `AppText` utilise les styles natifs iOS et les
+   `sp` Android ; ne pas fixer de `fontSize` hors `text.tsx`. Les composites
+   interactifs exigent un `accessibilityLabel` ; les décoratifs passent par
+   `accessibility.ts`.
+9. **Architecture feature-based** : `domain/` sans React/fetch, `lib/` = services,
+   `hooks/` = React Query, `pages/` = composition, `components/` = UI de feature.
+   Aucun `fetch` dans un composant.
+10. **Anatomie** : imports → types → constantes → composant → export nommé ;
+    un composant par fichier ; fichiers en kebab-case.
+11. **Phase démo** : `EXPO_PUBLIC_AUTH_MODE=mock` (auth démo) et
+    `EXPO_PUBLIC_DATA_SOURCE=mock` (services mockés) par défaut.
+    `EXPO_PUBLIC_MOCK_SCENARIO=success|empty|error` pour les états.
+    Les services mockés vivent dans `features/<x>/lib/` et devront être remplacés par
+    les services BFF ; les écrans/hooks restent inchangés. Un chip « Démo » signale
+    le mode dans Profil.
+12. Contraintes connues : `List` n'est pas lazy, `Icon` ne rend pas sur le web,
+    `matchContents` est figé au montage.
+13. **SwiftUI est iOS-only** : ne jamais importer `@expo/ui/swift-ui` dans un fichier
+    partagé ; les helpers plateforme ont un override `.android.ts`/`.web.ts`.
 
 ---
 
@@ -115,33 +121,27 @@ src/
 
 ```bash
 npm install
-npm start               # dev server
-npm run android         # build natif de dev (Expo UI est un module natif)
-npm run ios             # build natif iOS
-npm run typecheck       # tsc --noEmit
+npm start                # dev server
+npm run android          # build natif de dev
+npm run ios              # build natif iOS
+npm run typecheck        # tsc --noEmit
 npm run check:boundaries # app/ sans react-native ni @expo/ui
-npm run doctor          # expo-doctor
+npm run doctor           # expo-doctor
 ```
 
 ---
 
 ## 5. CI / release
 
-- **Convention de commit** : `feat(mobile):` déclenche une release **minor** ;
-  `fix(mobile):` / `perf(mobile):` une release **patch**. `refactor(mobile):`,
-  `docs:` et `chore:` ne créent **aucune version sémantique** (l'APK per-push
-  `apk-<run_id>` est quand même publié). Toute implémentation doit donc utiliser
-  `feat`/`fix` pour déclencher une release.
-- `ci.yml` → job `boundaries` (garde des frontières natives) + workflow réutilisable
-  `quizup-reusable-workflows/mobile-ci.yml@main` (commitlint, `npm ci --legacy-peer-deps`,
-  typecheck, expo-doctor).
-- `release.yml` → `mobile-release.yml@main` : semantic-release (profil `npm`) puis
-  `expo prebuild` + `gradlew assembleRelease` (arm64), APK en pre-release `apk-<run_id>`.
-- Secrets requis : `QUIZUP_GITHUB_TOKEN` (org), `ANDROID_KEYSTORE_*` (repo).
-  Keystore local hors dépôt : `~/Homeware/quizup-secrets/quizup-preview.p12`.
-- Variables publiques de release : `QUIZUP_FACEBOOK_CLIENT_TOKEN` (Client Token Meta)
-  et `QUIZUP_GOOGLE_IOS_CLIENT_ID` (client OAuth iOS). Vides = boutons sociaux
-  correspondants désactivés et plugin natif non ajouté.
+- **Convention de commit** : `feat(mobile):` → release **minor** ;
+  `fix(mobile):` / `perf(mobile):` → **patch**. `refactor`, `docs`, `chore` ne créent
+  pas de version sémantique (APK per-push quand même publié).
+- `ci.yml` → job `boundaries` + workflow réutilisable `mobile-ci.yml`.
+- `release.yml` → `mobile-release.yml` : semantic-release, prebuild Android, APK
+  pre-release `apk-<run_id>`.
+- Avant une vraie release : passer `EXPO_PUBLIC_AUTH_MODE=identity` et
+  `EXPO_PUBLIC_DATA_SOURCE=api`.
+- Secrets : `QUIZUP_GITHUB_TOKEN`, `ANDROID_KEYSTORE_*` ; keystore local hors dépôt.
 - `versionCode = major*1e6 + minor*1e3 + patch` (voir `app.config.js`).
 
 ---

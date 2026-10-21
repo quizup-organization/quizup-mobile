@@ -1,7 +1,7 @@
 import { Column, Host } from "@expo/ui";
 import type { UniversalAlignment } from "@expo/ui";
 import { createContext, useContext, type ReactNode } from "react";
-import { Platform, ScrollView, View } from "react-native";
+import { Platform, RefreshControl, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -37,10 +37,14 @@ export function Screen({
   children,
   tabBar = false,
   align = "start",
+  refreshing = false,
+  onRefresh,
 }: {
   children: ReactNode;
   tabBar?: boolean;
   align?: UniversalAlignment;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }) {
   const colors = useNativeColors();
   const { resolvedScheme, seed } = useThemeSettings();
@@ -55,6 +59,16 @@ export function Screen({
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
         automaticallyAdjustKeyboardInsets
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.accent}
+              colors={[colors.accent]}
+            />
+          ) : undefined
+        }
         contentContainerStyle={{ alignItems: "center" }}
       >
         <ScreenWidthContext.Provider value={contentWidth}>

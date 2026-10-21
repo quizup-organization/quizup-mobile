@@ -10,12 +10,12 @@ import {
 } from "react-native-fbsdk-next";
 
 import {
-  authConfig,
+  config,
   isFacebookConfigured,
   isGoogleConfigured,
-} from "./config";
-import { AuthCancelledError, AuthError } from "./errors";
-import type { FacebookCredentials } from "./types";
+} from "@/lib/config";
+import { AuthCancelledError, AuthError } from "@/features/auth/domain/errors";
+import type { FacebookCredentials } from "@/features/auth/domain/session";
 
 let googleConfigured = false;
 
@@ -31,10 +31,10 @@ function ensureGoogleConfigured(): void {
   if (googleConfigured) return;
 
   GoogleSignin.configure({
-    webClientId: authConfig.googleWebClientId,
+    webClientId: config.googleWebClientId,
     iosClientId:
-      Platform.OS === "ios" && authConfig.googleIosClientId
-        ? authConfig.googleIosClientId
+      Platform.OS === "ios" && config.googleIosClientId
+        ? config.googleIosClientId
         : undefined,
     offlineAccess: false,
   });

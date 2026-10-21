@@ -16,6 +16,7 @@ export { icons, type IconKey } from "@/components/fragments/icons";
 export { ProgressBar } from "@/components/fragments/progress-bar";
 export { AppRow } from "@/components/fragments/row";
 export { AppSocialButton } from "@/components/fragments/social-button";
+export { AppSwitch } from "@/components/fragments/switch";
 export {
   AppText,
   type TextTone,
