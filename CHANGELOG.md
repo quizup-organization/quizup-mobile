@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.2.0...v1.3.0) (2026-10-21)
+
+### Features
+
+* **mobile:** branche les ecrans sur des mocks types ([81f4d32](https://github.com/quizup-organization/quizup-mobile/commit/81f4d3251051d69b24f7c0b694d8316473a629db))
+
 ## [1.2.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.1.2...v1.2.0) (2026-10-21)
 
 ### Features
