@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.1.2...v1.2.0) (2026-10-21)
+
+### Features
+
+* **mobile:** supporte le Dynamic Type et l'accessibilite native ([bffc7c7](https://github.com/quizup-organization/quizup-mobile/commit/bffc7c777a29c962d0a124239db775b994bbec01))
+
 ## [1.1.2](https://github.com/quizup-organization/quizup-mobile/compare/v1.1.1...v1.1.2) (2026-10-20)
 
 ### Bug Fixes
