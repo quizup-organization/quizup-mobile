@@ -119,6 +119,11 @@ npm run doctor          # expo-doctor
 
 ## 5. CI / release
 
+- **Convention de commit** : `feat(mobile):` déclenche une release **minor** ;
+  `fix(mobile):` / `perf(mobile):` une release **patch**. `refactor(mobile):`,
+  `docs:` et `chore:` ne créent **aucune version sémantique** (l'APK per-push
+  `apk-<run_id>` est quand même publié). Toute implémentation doit donc utiliser
+  `feat`/`fix` pour déclencher une release.
 - `ci.yml` → job `boundaries` (garde des frontières natives) + workflow réutilisable
   `quizup-reusable-workflows/mobile-ci.yml@main` (commitlint, `npm ci --legacy-peer-deps`,
   typecheck, expo-doctor).
