@@ -1,7 +1,6 @@
 export { Screen, useScreenWidth } from "@/components/screen";
 export { Carousel } from "@/components/layout/carousel";
 export { Grid } from "@/components/layout/grid";
-export { PageHeader } from "@/components/layout/page-header";
 export { Section } from "@/components/layout/section";
 export { Column, Row, Spacer } from "@/components/layout/stack";
 

@@ -12,3 +12,7 @@ export function decorativeModifiers() {
 export function progressModifiers(_label: string, _percent: number) {
   return [];
 }
+
+export function switchModifiers(_label: string, _value: boolean) {
+  return [];
+}

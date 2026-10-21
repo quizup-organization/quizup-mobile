@@ -37,7 +37,7 @@ function RootNavigator() {
     }
 
     if (status === "signedIn" && onLoginScreen) {
-      router.replace("/(tabs)");
+      router.replace("/");
       return;
     }
 
@@ -50,16 +50,25 @@ function RootNavigator() {
     <>
       <Stack
         screenOptions={{
-          headerShown: false,
+          headerShown: true,
+          headerTintColor: colors.accent,
+          headerStyle: { backgroundColor: colors.background },
+          headerTitleStyle: { color: colors.text },
+          headerShadowVisible: false,
+          headerBackTitle: "Retour",
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="login" options={{ animation: "fade" }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="topics/[id]" options={{ title: "Sujet" }} />
+        <Stack.Screen name="players/[id]" options={{ title: "Joueur" }} />
         <Stack.Screen
-          name="topic/[id]"
-          options={{ animation: "slide_from_right" }}
+          name="notifications"
+          options={{ title: "Notifications" }}
         />
+        <Stack.Screen name="settings" options={{ title: "Préférences" }} />
+        <Stack.Screen name="search" options={{ title: "Rechercher" }} />
       </Stack>
       <StatusBar style="auto" />
     </>

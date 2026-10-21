@@ -3,9 +3,9 @@ import { useState } from "react";
 
 import {
   AppChip,
+  AppText,
   Carousel,
   Grid,
-  PageHeader,
   Screen,
   Section,
 } from "@/components";
@@ -71,11 +71,6 @@ export function TopicsPage() {
       refreshing={topics.isRefetching || facets.isRefetching}
       onRefresh={refetch}
     >
-      <PageHeader
-        title="Sujets"
-        subtitle={`${topics.data?.totalElements ?? 0} sujets disponibles`}
-      />
-
       <Section>
         <Carousel
           items={categories}
@@ -88,6 +83,10 @@ export function TopicsPage() {
           )}
         />
       </Section>
+
+      <AppText variant="caption" tone="muted">
+        {`${topics.data?.totalElements ?? 0} sujets`}
+      </AppText>
 
       {items.length === 0 ? (
         <EmptyState
@@ -103,7 +102,7 @@ export function TopicsPage() {
             <TopicCard
               topic={topic}
               width={width}
-              onPress={() => router.push(`/topic/${topic.topicId}`)}
+              onPress={() => router.push(`/topics/${topic.topicId}`)}
             />
           )}
         />

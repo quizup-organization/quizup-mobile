@@ -33,6 +33,26 @@ export function isUnread(notification: NotificationView): boolean {
   return notification.readAt === null;
 }
 
+/** Cible de navigation d'une notification, sans dépendre des routes du client. */
+export type NotificationIntent =
+  | { kind: "player"; id: string }
+  | { kind: "topic"; id: string }
+  | null;
+
+export function notificationIntent(
+  notification: NotificationView,
+): NotificationIntent {
+  if (notification.type === "ACCOUNT_SUSPENDED") return null;
+  if (notification.type === "QUESTION_REPORTED") {
+    return notification.topicId
+      ? { kind: "topic", id: notification.topicId }
+      : null;
+  }
+  return notification.actorId
+    ? { kind: "player", id: notification.actorId }
+    : null;
+}
+
 /** Libellé français de l'inbox (la version web passe par i18next). */
 export function notificationLabel(
   type: NotificationType,

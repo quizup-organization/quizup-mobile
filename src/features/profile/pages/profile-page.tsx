@@ -1,3 +1,5 @@
+import { useRouter } from "expo-router";
+
 import {
   AppAvatar,
   AppCard,
@@ -21,6 +23,7 @@ import { LoadingState } from "@/shared/components/loading-state";
 import { formatNumber, initials } from "@/shared/utils/format";
 
 export function ProfilePage() {
+  const router = useRouter();
   const me = useMe();
   const { logout } = useAuth();
 
@@ -123,6 +126,17 @@ export function ProfilePage() {
             ))}
           </Row>
         )}
+      </Section>
+
+      <Section title="Réglages">
+        <Column spacing={2}>
+          <AppRow
+            icon="settings"
+            title="Préférences"
+            subtitle="Apparence et notifications"
+            onPress={() => router.push("/settings")}
+          />
+        </Column>
       </Section>
 
       <Section title="Compte">

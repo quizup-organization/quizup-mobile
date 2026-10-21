@@ -2,9 +2,10 @@ import { useRouter } from "expo-router";
 
 import {
   Carousel,
-  PageHeader,
+  Column,
   Screen,
   Section,
+  AppText,
 } from "@/components";
 import { useHome } from "@/features/home/hooks/use-home";
 import { useMe } from "@/features/profile/hooks/use-me";
@@ -51,7 +52,7 @@ export function HomePage() {
       data.trendingTopics.length === 0 &&
       data.newTopics.length === 0);
 
-  const openTopic = (topicId: string) => router.push(`/topic/${topicId}`);
+  const openTopic = (topicId: string) => router.push(`/topics/${topicId}`);
 
   return (
     <Screen
@@ -59,10 +60,14 @@ export function HomePage() {
       refreshing={home.isRefetching || me.isRefetching}
       onRefresh={refetch}
     >
-      <PageHeader
-        title={pseudonym ? `Bonjour ${pseudonym}` : "Bonjour"}
-        subtitle="Prêt pour ta session du jour ?"
-      />
+      <Column spacing={4}>
+        <AppText variant="title">
+          {pseudonym ? `Bonjour ${pseudonym}` : "Bonjour"}
+        </AppText>
+        <AppText variant="body" tone="muted">
+          Prêt pour ta session du jour ?
+        </AppText>
+      </Column>
 
       {empty || !data ? (
         <EmptyState

@@ -199,7 +199,7 @@ export function LoginPage() {
     pending === "facebook" ? "Connexion..." : "Continuer avec Facebook";
 
   return (
-    <Screen align="center">
+    <Screen topInset align="center">
       <Column spacing={6} alignment="center" style={{ width: formWidth }}>
         <AppText variant="display">QuizUp</AppText>
         <AppText variant="body" tone="muted" align="center" width={formWidth}>

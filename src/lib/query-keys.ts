@@ -38,4 +38,12 @@ export const queryKeys = {
     unreadCount: () => ["notifications", "unread-count"] as const,
     preferences: () => ["notification-preferences"] as const,
   },
+  challenges: {
+    all: ["challenges"] as const,
+    list: () => ["challenges", "list"] as const,
+    pendingCount: () => ["challenges", "pending-count"] as const,
+  },
+  search: {
+    players: (query: string) => ["search", "players", query] as const,
+  },
 } as const;

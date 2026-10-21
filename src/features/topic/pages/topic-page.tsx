@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
 import {
   AppAvatar,
@@ -77,7 +77,9 @@ export function TopicPage() {
     !hasMe && meEntry ? [...entries, meEntry] : entries;
 
   return (
-    <Screen refreshing={overview.isRefetching} onRefresh={refetch}>
+    <>
+      <Stack.Screen options={{ title: name }} />
+      <Screen refreshing={overview.isRefetching} onRefresh={refetch}>
       <Row spacing={8} alignment="center" onPress={() => router.back()}>
         <AppText variant="label" tone="accent">
           Retour
@@ -207,6 +209,7 @@ export function TopicPage() {
       <AppText variant="caption" tone="muted" align="center">
         Les duels et salles arrivent dans une prochaine étape.
       </AppText>
-    </Screen>
+      </Screen>
+    </>
   );
 }

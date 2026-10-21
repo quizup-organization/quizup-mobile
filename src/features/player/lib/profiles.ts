@@ -7,7 +7,7 @@ import type {
 import type { Page } from "@/shared/types/api";
 import { ApiError } from "@/shared/types/api";
 import { toPage } from "@/shared/utils/page";
-import { db, getProfile, peopleFor, setFollowPlayer } from "@/mocks/db";
+import { db, getProfile, peopleFor, playerCard, setFollowPlayer } from "@/mocks/db";
 import { assertSuccess, isEmpty, mockDelay } from "@/mocks/scenario";
 
 function sortPeople(people: PlayerCard[], sort: PeopleParams["sort"]): PlayerCard[] {
@@ -61,6 +61,21 @@ export const profilesService = {
       params.page ?? 0,
       params.size ?? 20,
     );
+  },
+
+  async search(query: string): Promise<Page<PlayerCard>> {
+    await mockDelay(260);
+    assertSuccess();
+    if (isEmpty() || query.trim().length < 2) {
+      return toPage([], 0, 20);
+    }
+    const normalized = query.trim().toLowerCase();
+    const people = db.profiles
+      .filter((profile) =>
+        (profile.pseudonym ?? "").toLowerCase().includes(normalized),
+      )
+      .map((profile) => playerCard(profile));
+    return toPage(people, 0, 20);
   },
 
   async follow(userId: string): Promise<void> {

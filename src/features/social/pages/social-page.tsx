@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { useRouter } from "expo-router";
 
 import {
   AppChip,
   Carousel,
   Column,
-  PageHeader,
   Screen,
   Section,
 } from "@/components";
@@ -16,6 +16,7 @@ import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 
 export function SocialPage() {
+  const router = useRouter();
   const [direction, setDirection] = useState<PeopleDirection>("following");
   const { me, people } = usePeopleDirectory(direction);
 
@@ -53,11 +54,6 @@ export function SocialPage() {
       refreshing={me.isRefetching || people.isRefetching}
       onRefresh={refetch}
     >
-      <PageHeader
-        title="Social"
-        subtitle="Tes abonnements et tes abonnés."
-      />
-
       <Section>
         <Carousel
           items={[
@@ -90,7 +86,11 @@ export function SocialPage() {
         ) : (
           <Column spacing={2}>
             {items.map((player) => (
-              <PlayerRow key={player.userId} player={player} />
+              <PlayerRow
+                key={player.userId}
+                player={player}
+                onPress={() => router.push(`/players/${player.userId}`)}
+              />
             ))}
           </Column>
         )}

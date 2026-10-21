@@ -3,12 +3,18 @@ import type {
   PeopleDirection,
   PlayerCard,
   PlayerProfile,
+  UserRef,
 } from "@/features/player/domain/profile";
 import type { Me } from "@/features/profile/domain/me";
+import type {
+  PendingChallenge,
+  RoomSummary,
+} from "@/features/challenges/domain/challenge";
 import type {
   LeaderboardEntry,
   TopicCard,
   TopicProgress,
+  TopicRef,
 } from "@/features/topics/domain/topic";
 
 export const DEMO_USER_ID = "demo-user";
@@ -25,6 +31,8 @@ export const db: {
   followers: Set<string>;
   notifications: NotificationView[];
   preferences: NotificationPreferenceView[];
+  challenges: PendingChallenge[];
+  rooms: RoomSummary[];
 } = {
   me: {
     userId: DEMO_USER_ID,
@@ -325,7 +333,10 @@ export const db: {
         title: "Légende",
         xpForNextLevel: 14_000,
         levelProgressPercent: 89,
-        badges: [],
+        badges: [
+          { code: "STREAK_5", label: "Série de 5 jours" },
+          { code: "PERFECT_DUEL", label: "Sans faute" },
+        ],
       },
       stats: {
         played: 312,
@@ -356,7 +367,10 @@ export const db: {
         title: "Stratège",
         xpForNextLevel: 13_000,
         levelProgressPercent: 92,
-        badges: [],
+        badges: [
+          { code: "STREAK_5", label: "Série de 5 jours" },
+          { code: "PERFECT_DUEL", label: "Sans faute" },
+        ],
       },
       stats: {
         played: 280,
@@ -387,7 +401,10 @@ export const db: {
         title: "Curieuse",
         xpForNextLevel: 12_800,
         levelProgressPercent: 88,
-        badges: [],
+        badges: [
+          { code: "STREAK_5", label: "Série de 5 jours" },
+          { code: "PERFECT_DUEL", label: "Sans faute" },
+        ],
       },
       stats: {
         played: 244,
@@ -418,7 +435,10 @@ export const db: {
         title: "Touche-à-tout",
         xpForNextLevel: 11_000,
         levelProgressPercent: 90,
-        badges: [],
+        badges: [
+          { code: "STREAK_5", label: "Série de 5 jours" },
+          { code: "PERFECT_DUEL", label: "Sans faute" },
+        ],
       },
       stats: {
         played: 201,
@@ -449,7 +469,10 @@ export const db: {
         title: "Observatrice",
         xpForNextLevel: 10_500,
         levelProgressPercent: 85,
-        badges: [],
+        badges: [
+          { code: "STREAK_5", label: "Série de 5 jours" },
+          { code: "PERFECT_DUEL", label: "Sans faute" },
+        ],
       },
       stats: {
         played: 188,
@@ -480,7 +503,10 @@ export const db: {
         title: "Régulier",
         xpForNextLevel: 9_000,
         levelProgressPercent: 85,
-        badges: [],
+        badges: [
+          { code: "STREAK_5", label: "Série de 5 jours" },
+          { code: "PERFECT_DUEL", label: "Sans faute" },
+        ],
       },
       stats: {
         played: 160,
@@ -597,6 +623,9 @@ export const db: {
     { category: "QUESTION", enabled: true },
     { category: "ACCOUNT", enabled: true },
   ],
+
+  challenges: [],
+  rooms: [],
 };
 
 export function getTopic(topicId: string): TopicCard | undefined {
@@ -707,3 +736,120 @@ export function markAllNotificationsRead(): void {
     item.readAt === null ? { ...item, readAt: now } : item,
   );
 }
+
+export function topicRef(topicId: string): TopicRef {
+  const topic = getTopic(topicId);
+  if (!topic) throw new Error(`Sujet mock introuvable : ${topicId}`);
+  return {
+    topicId: topic.topicId,
+    names: topic.names,
+    category: topic.category,
+    emoji: topic.emoji,
+    color: topic.color,
+    imageUrl: topic.imageUrl,
+    titles: null,
+  };
+}
+
+export function userRef(userId: string): UserRef {
+  const profile = getProfile(userId);
+  if (!profile) throw new Error(`Joueur mock introuvable : ${userId}`);
+  return {
+    userId: profile.userId,
+    pseudonym: profile.pseudonym,
+    avatarOptions: profile.avatarOptions,
+    suspended: profile.suspended,
+  };
+}
+
+export function challengesFor(): {
+  received: PendingChallenge[];
+  sent: PendingChallenge[];
+  rooms: RoomSummary[];
+} {
+  return {
+    received: db.challenges.filter(
+      (challenge) =>
+        challenge.direction === "received" && challenge.status === "PENDING",
+    ),
+    sent: db.challenges.filter(
+      (challenge) =>
+        challenge.direction === "sent" && challenge.status === "PENDING",
+    ),
+    rooms: db.rooms.filter((room) => room.status !== "EXPIRED"),
+  };
+}
+
+export function pendingChallengesCount(): number {
+  return (
+    db.challenges.filter(
+      (challenge) =>
+        challenge.direction === "received" && challenge.status === "PENDING",
+    ).length +
+    db.rooms.filter(
+      (room) =>
+        room.status === "WAITING_PLAYERS" ||
+        room.status === "FETCHING_PLAYERS",
+    ).length
+  );
+}
+
+export function acceptChallenge(challengeId: string): void {
+  const challenge = db.challenges.find(
+    (item) => item.challengeId === challengeId,
+  );
+  if (!challenge || challenge.status !== "PENDING") return;
+
+  challenge.status = "ACCEPTED";
+  db.rooms.push({
+    roomId: `room-${challengeId}`,
+    topic: challenge.topic,
+    status: "WAITING_PLAYERS",
+    opponent: challenge.opponent,
+    vsBot: false,
+    expiresAt: challenge.expiresAt,
+  });
+}
+
+export function declineChallenge(challengeId: string): void {
+  const challenge = db.challenges.find(
+    (item) => item.challengeId === challengeId,
+  );
+  if (challenge) challenge.status = "DECLINED";
+}
+
+db.challenges.push(
+  {
+    challengeId: "challenge-camille",
+    direction: "received",
+    topic: topicRef("sciences"),
+    opponent: userRef("camille"),
+    expiresAt: iso(-90),
+    status: "PENDING",
+  },
+  {
+    challengeId: "challenge-yanis",
+    direction: "received",
+    topic: topicRef("histoire"),
+    opponent: userRef("yanis"),
+    expiresAt: iso(-45),
+    status: "PENDING",
+  },
+  {
+    challengeId: "challenge-sofia",
+    direction: "sent",
+    topic: topicRef("cinema"),
+    opponent: userRef("sofia"),
+    expiresAt: iso(-120),
+    status: "PENDING",
+  },
+);
+
+db.rooms.push({
+  roomId: "room-malik",
+  topic: topicRef("sport"),
+  status: "WAITING_PLAYERS",
+  opponent: userRef("malik"),
+  vsBot: false,
+  expiresAt: iso(-60),
+});

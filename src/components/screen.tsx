@@ -18,7 +18,7 @@ const ScreenWidthContext = createContext<number | null>(null);
 
 /**
  * Largeur de contenu fournie par l'unique `Screen` de l'écran.
- * Réservé aux fragments de layout (PageHeader, Section, Carousel, Grid, Card).
+ * Réservé aux fragments de layout (Section, Carousel, Grid, Card).
  */
 export function useScreenWidth(): number {
   const width = useContext(ScreenWidthContext);
@@ -39,12 +39,15 @@ export function Screen({
   align = "start",
   refreshing = false,
   onRefresh,
+  topInset = false,
 }: {
   children: ReactNode;
   tabBar?: boolean;
   align?: UniversalAlignment;
   refreshing?: boolean;
   onRefresh?: () => void;
+  /** À activer uniquement sans header natif (login, plein écran). */
+  topInset?: boolean;
 }) {
   const colors = useNativeColors();
   const { resolvedScheme, seed } = useThemeSettings();
@@ -84,7 +87,7 @@ export function Screen({
               style={{
                 width: hostWidth,
                 paddingHorizontal: SCREEN_HORIZONTAL_PADDING,
-                paddingTop: insets.top + 12,
+                paddingTop: topInset ? insets.top + 12 : 12,
                 paddingBottom: insets.bottom + (tabBar ? TAB_BAR_INSET : 24),
               }}
             >

@@ -1,69 +1,57 @@
+import { useRouter } from "expo-router";
+
 import {
   AppButton,
-  AppSwitch,
   AppText,
   Column,
-  PageHeader,
   Row,
   Screen,
   Section,
   Spacer,
 } from "@/components";
-import type { NotificationCategory } from "@/features/notifications/domain/notification";
-import { isUnread } from "@/features/notifications/domain/notification";
 import { NotificationRow } from "@/features/notifications/components/notification-row";
 import {
+  isUnread,
+  notificationIntent,
+  type NotificationView,
+} from "@/features/notifications/domain/notification";
+import {
   useNotifications,
-  useNotificationPreferences,
   useUnreadNotificationsCount,
 } from "@/features/notifications/hooks/use-notifications";
 import {
   useDeleteNotification,
   useMarkAllNotificationsRead,
   useSetNotificationRead,
-  useUpdateNotificationPreference,
 } from "@/features/notifications/hooks/use-notification-mutations";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 
-const PREFERENCE_LABELS: Record<NotificationCategory, string> = {
-  FOLLOW: "Abonnements",
-  ROOM: "Salles et défis",
-  QUESTION: "Questions",
-  ACCOUNT: "Compte",
-};
-
 export function NotificationsPage() {
+  const router = useRouter();
   const notifications = useNotifications();
   const unreadCount = useUnreadNotificationsCount();
-  const preferences = useNotificationPreferences();
   const markAllRead = useMarkAllNotificationsRead();
   const setRead = useSetNotificationRead();
   const remove = useDeleteNotification();
-  const updatePreference = useUpdateNotificationPreference();
 
   const refetch = () => {
     void notifications.refetch();
     void unreadCount.refetch();
-    void preferences.refetch();
   };
 
-  if (
-    notifications.isLoading ||
-    unreadCount.isLoading ||
-    preferences.isLoading
-  ) {
+  if (notifications.isLoading || unreadCount.isLoading) {
     return (
-      <Screen tabBar>
+      <Screen>
         <LoadingState label="Chargement des notifications…" />
       </Screen>
     );
   }
 
-  if (notifications.isError || unreadCount.isError || preferences.isError) {
+  if (notifications.isError || unreadCount.isError) {
     return (
-      <Screen tabBar>
+      <Screen>
         <ErrorState
           message="Impossible de charger les notifications."
           onRetry={refetch}
@@ -75,31 +63,35 @@ export function NotificationsPage() {
   const items = notifications.data?.content ?? [];
   const unread = unreadCount.data?.count ?? 0;
 
+  function open(notification: NotificationView) {
+    if (isUnread(notification)) {
+      setRead.mutate({ notificationId: notification.notificationId, read: true });
+    }
+
+    const intent = notificationIntent(notification);
+    if (intent?.kind === "player") {
+      router.push(`/players/${intent.id}`);
+    } else if (intent?.kind === "topic") {
+      router.push(`/topics/${intent.id}`);
+    }
+  }
+
   return (
     <Screen
-      tabBar
-      refreshing={
-        notifications.isRefetching ||
-        unreadCount.isRefetching ||
-        preferences.isRefetching
-      }
+      refreshing={notifications.isRefetching || unreadCount.isRefetching}
       onRefresh={refetch}
     >
-      <PageHeader
-        title="Alertes"
-        subtitle={
-          unread > 0 ? `${unread} notifications non lues` : "Tout est à jour"
-        }
-      />
-
       <Row spacing={8} alignment="center">
+        <AppText variant="body" tone="muted">
+          {unread > 0 ? `${unread} notifications non lues` : "Tout est à jour"}
+        </AppText>
+        <Spacer flexible />
         <AppButton
-          variant="outlined"
-          label="Tout marquer lu"
+          variant="text"
+          label="Tout lire"
           disabled={unread === 0 || markAllRead.isPending}
           onPress={() => markAllRead.mutate()}
         />
-        <Spacer flexible />
       </Row>
 
       <Section title="Inbox">
@@ -110,54 +102,16 @@ export function NotificationsPage() {
           />
         ) : (
           <Column spacing={2}>
-            {items.map((notification) => {
-              const read = !isUnread(notification);
-              return (
-                <NotificationRow
-                  key={notification.notificationId}
-                  notification={notification}
-                  onPress={() =>
-                    setRead.mutate({
-                      notificationId: notification.notificationId,
-                      read: !read,
-                    })
-                  }
-                  onDelete={() =>
-                    remove.mutate(notification.notificationId)
-                  }
-                />
-              );
-            })}
+            {items.map((notification) => (
+              <NotificationRow
+                key={notification.notificationId}
+                notification={notification}
+                onPress={() => open(notification)}
+                onDelete={() => remove.mutate(notification.notificationId)}
+              />
+            ))}
           </Column>
         )}
-      </Section>
-
-      <Section title="Préférences">
-        <Column spacing={2}>
-          {(preferences.data ?? []).map((preference) => (
-            <Row
-              key={preference.category}
-              spacing={12}
-              alignment="center"
-              style={{ paddingVertical: 8 }}
-            >
-              <AppText variant="label">
-                {PREFERENCE_LABELS[preference.category]}
-              </AppText>
-              <Spacer flexible />
-              <AppSwitch
-                value={preference.enabled}
-                disabled={updatePreference.isPending}
-                onValueChange={(enabled) =>
-                  updatePreference.mutate({
-                    category: preference.category,
-                    enabled,
-                  })
-                }
-              />
-            </Row>
-          ))}
-        </Column>
       </Section>
     </Screen>
   );

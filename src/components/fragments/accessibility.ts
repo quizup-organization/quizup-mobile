@@ -36,3 +36,12 @@ export function progressModifiers(label: string, percent: number) {
     accessibilityValue(`${percent} %`),
   ];
 }
+
+/** Interrupteur : libellé + état annoncés. */
+export function switchModifiers(label: string, value: boolean) {
+  return [
+    accessibilityLabel(label),
+    accessibilityAddTraits(["isToggle"]),
+    accessibilityValue(value ? "Activé" : "Désactivé"),
+  ];
+}

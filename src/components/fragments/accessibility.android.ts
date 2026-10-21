@@ -24,3 +24,12 @@ export function decorativeModifiers() {
 export function progressModifiers(label: string, percent: number) {
   return [semantics({ contentDescription: `${label}, ${percent} %` })];
 }
+
+/** Interrupteur : libellé et état annoncés. */
+export function switchModifiers(label: string, value: boolean) {
+  return [
+    semantics({
+      contentDescription: `${label}, ${value ? "activé" : "désactivé"}`,
+    }),
+  ];
+}
