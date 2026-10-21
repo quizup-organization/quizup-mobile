@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.3.0...v1.4.0) (2026-10-21)
+
+### Features
+
+* **mobile:** aligne l'IA sur quizup-web (onglets, headers, defis) ([6446765](https://github.com/quizup-organization/quizup-mobile/commit/644676566ae6e2d6c05ec5dc3db9c85ccc34c982))
+
 ## [1.3.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.2.0...v1.3.0) (2026-10-21)
 
 ### Features
