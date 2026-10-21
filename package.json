@@ -33,7 +33,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "typecheck": "tsc --noEmit",
-    "doctor": "npx expo-doctor"
+    "doctor": "npx expo-doctor",
+    "check:boundaries": "sh scripts/check-native-boundaries.sh"
   },
   "private": true
 }

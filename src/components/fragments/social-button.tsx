@@ -1,7 +1,7 @@
 import { Button, Row, Text } from "@expo/ui";
 import type { UniversalStyle } from "@expo/ui";
 
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useNativeColors } from "@/theme";
 
 /** Bouton social avec un badge de marque (G / f) et un libellé. */
 export function AppSocialButton({
@@ -19,7 +19,7 @@ export function AppSocialButton({
   disabled?: boolean;
   style?: UniversalStyle;
 }) {
-  const text = useThemeColor({}, "text");
+  const colors = useNativeColors();
 
   return (
     <Button
@@ -42,7 +42,7 @@ export function AppSocialButton({
           textStyle={{
             fontSize: 17,
             fontWeight: "600",
-            color: text,
+            color: colors.text,
           }}
         >
           {label}

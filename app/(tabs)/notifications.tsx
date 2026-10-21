@@ -1,12 +1,13 @@
-import { Column, Row, Spacer } from "@expo/ui";
-
 import {
   AppDot,
   AppIconTile,
   AppText,
-  Block,
+  Column,
+  PageHeader,
+  Row,
   Screen,
   Section,
+  Spacer,
 } from "@/components";
 import { notifications } from "@/data/fixtures";
 
@@ -14,17 +15,13 @@ export default function NotificationsScreen() {
   const unread = notifications.filter((item) => item.unread).length;
 
   return (
-    <Screen tabBar>
-      <Block>
-        <Column spacing={4}>
-          <AppText variant="title">Alertes</AppText>
-          <AppText variant="body" tone="muted">
-            {unread > 0
-              ? `${unread} notifications non lues`
-              : "Tout est à jour"}
-          </AppText>
-        </Column>
-      </Block>
+    <Screen>
+      <PageHeader
+        title="Alertes"
+        subtitle={
+          unread > 0 ? `${unread} notifications non lues` : "Tout est à jour"
+        }
+      />
 
       <Section title="Aujourd'hui">
         <Column spacing={4}>

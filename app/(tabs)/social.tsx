@@ -1,6 +1,3 @@
-import { Column, Row, Spacer } from "@expo/ui";
-import { ScrollView } from "react-native";
-
 import {
   AppAvatar,
   AppCard,
@@ -8,39 +5,35 @@ import {
   AppIconTile,
   AppRow,
   AppText,
-  Block,
-  Inline,
+  Carousel,
+  Column,
+  PageHeader,
+  Row,
   Screen,
   Section,
+  Spacer,
 } from "@/components";
 import { activity, friends, topics } from "@/data/fixtures";
 
 export default function SocialScreen() {
   return (
-    <Screen tabBar>
-      <Block>
-        <Column spacing={4}>
-          <AppText variant="title">Social</AppText>
-          <AppText variant="body" tone="muted">
-            Tes amis et leurs derniers défis.
-          </AppText>
-        </Column>
-      </Block>
+    <Screen>
+      <PageHeader
+        title="Social"
+        subtitle="Tes amis et leurs derniers défis."
+      />
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8 }}
-      >
-        {friends.slice(0, 4).map((friend) => (
-          <Inline key={friend.id}>
+      <Section>
+        <Carousel
+          items={friends.slice(0, 4)}
+          renderItem={(friend) => (
             <AppChip
               label={`${friend.name} · ${friend.level}`}
               icon="social"
             />
-          </Inline>
-        ))}
-      </ScrollView>
+          )}
+        />
+      </Section>
 
       <Section title="Amis" action={`${friends.length} joueurs`}>
         <Column spacing={2}>

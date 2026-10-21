@@ -12,15 +12,15 @@ import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
-import { useTheme } from "@/hooks/use-theme";
 import { ThemeProvider, useThemeSettings } from "@/providers/theme-provider";
+import { useNativeColors } from "@/theme";
 
 void SplashScreen.preventAutoHideAsync().catch(() => {
   // Le splash peut déjà être masqué (Fast Refresh).
 });
 
 function RootNavigator() {
-  const theme = useTheme();
+  const colors = useNativeColors();
   const { status } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -50,7 +50,7 @@ function RootNavigator() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: theme.background },
+          contentStyle: { backgroundColor: colors.background },
         }}
       >
         <Stack.Screen name="(tabs)" />

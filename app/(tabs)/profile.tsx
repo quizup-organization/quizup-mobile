@@ -1,30 +1,27 @@
-import { Column, Row, Spacer } from "@expo/ui";
-
 import {
   AppAvatar,
   AppCard,
   AppChip,
   AppRow,
   AppText,
-  Block,
+  Column,
+  Grid,
   ProgressBar,
+  Row,
   Screen,
   Section,
+  Spacer,
 } from "@/components";
 import { useAuth } from "@/auth/AuthProvider";
 import { profile } from "@/data/fixtures";
-import { useContentWidth } from "@/hooks/use-content-width";
 
 export default function ProfileScreen() {
-  const contentWidth = useContentWidth();
   const { session, logout } = useAuth();
-
-  const statWidth = Math.floor((contentWidth - 20) / 3);
   const progress = profile.xp / profile.xpToNext;
 
   return (
-    <Screen tabBar>
-      <Block>
+    <Screen>
+      <Section>
         <Column spacing={10} alignment="center">
           <AppAvatar initials={profile.initials} size={76} />
           <Column spacing={2} alignment="center">
@@ -43,9 +40,9 @@ export default function ProfileScreen() {
             <AppChip label="Série 5 j" icon="fire" />
           </Row>
         </Column>
-      </Block>
+      </Section>
 
-      <Block>
+      <Section>
         <AppCard>
           <Row spacing={8} alignment="center">
             <AppText variant="label">Progression</AppText>
@@ -55,26 +52,27 @@ export default function ProfileScreen() {
             </AppText>
           </Row>
           <Row alignment="center">
-            <ProgressBar value={progress} width={contentWidth - 30} />
+            <ProgressBar value={progress} />
           </Row>
           <AppText variant="caption" tone="muted">
             {`Encore ${(profile.xpToNext - profile.xp).toLocaleString("fr-FR")} XP pour le niveau ${profile.level + 1}.`}
           </AppText>
         </AppCard>
-      </Block>
+      </Section>
 
-      <Block>
-        <Row spacing={10}>
-          {profile.stats.map((stat) => (
-            <AppCard key={stat.label} width={statWidth}>
-              <AppText variant="heading">{stat.value}</AppText>
-              <AppText variant="caption" tone="muted">
-                {stat.label}
-              </AppText>
-            </AppCard>
-          ))}
-        </Row>
-      </Block>
+      <Grid
+        items={profile.stats}
+        columns={3}
+        gap={10}
+        renderItem={(stat, width) => (
+          <AppCard width={width}>
+            <AppText variant="heading">{stat.value}</AppText>
+            <AppText variant="caption" tone="muted">
+              {stat.label}
+            </AppText>
+          </AppCard>
+        )}
+      />
 
       <Section title="Badges">
         <Row spacing={8} alignment="center">

@@ -1,6 +1,4 @@
-import { Column, Row, Spacer } from "@expo/ui";
 import { useRouter } from "expo-router";
-import { ScrollView } from "react-native";
 
 import {
   AppAvatar,
@@ -10,9 +8,13 @@ import {
   AppIcon,
   AppIconTile,
   AppText,
-  Block,
+  Carousel,
+  Column,
+  PageHeader,
+  Row,
   Screen,
   Section,
+  Spacer,
 } from "@/components";
 import { dailyChallenge, leaderboard, streak, topics } from "@/data/fixtures";
 
@@ -20,20 +22,15 @@ export default function HomeScreen() {
   const router = useRouter();
 
   return (
-    <Screen tabBar>
-      <Block>
-        <Column spacing={8}>
-          <AppText variant="title">Bonjour Nadjim</AppText>
-          <AppText variant="body" tone="muted">
-            Prêt pour ta session du jour ?
-          </AppText>
-          <Row spacing={8} alignment="center">
-            <AppChip label={streak.label} icon="fire" selected />
-          </Row>
-        </Column>
-      </Block>
+    <Screen>
+      <PageHeader
+        title="Bonjour Nadjim"
+        subtitle="Prêt pour ta session du jour ?"
+      >
+        <AppChip label={streak.label} icon="fire" selected />
+      </PageHeader>
 
-      <Block>
+      <Section>
         <AppCard>
           <Row spacing={12} alignment="center">
             <AppIconTile name="bolt" size={44} />
@@ -56,27 +53,15 @@ export default function HomeScreen() {
             <Spacer flexible />
           </Row>
         </AppCard>
-      </Block>
+      </Section>
 
-      <Block>
-        <Row spacing={8} alignment="center">
-          <AppText variant="heading">Populaires</AppText>
-          <Spacer flexible />
-          <AppText variant="caption" tone="muted">
-            Cette semaine
-          </AppText>
-        </Row>
-      </Block>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 12 }}
-      >
-        {topics.slice(0, 4).map((topic) => (
-          <Block key={topic.id} width={176}>
+      <Section title="Populaires" action="Cette semaine">
+        <Carousel
+          items={topics.slice(0, 4)}
+          itemWidth={176}
+          renderItem={(topic, width) => (
             <AppCard
-              width={176}
+              width={width}
               onPress={() => router.push(`/topic/${topic.id}`)}
             >
               <AppIconTile
@@ -92,9 +77,9 @@ export default function HomeScreen() {
                 {`${topic.players.toLocaleString("fr-FR")} joueurs`}
               </AppText>
             </AppCard>
-          </Block>
-        ))}
-      </ScrollView>
+          )}
+        />
+      </Section>
 
       <Section title="Classement" action="Cette semaine">
         <Column spacing={2}>

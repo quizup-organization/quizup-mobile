@@ -11,7 +11,15 @@ permissions:
   contents: write
 
 jobs:
+  boundaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Vérifie les frontières natives
+        run: sh scripts/check-native-boundaries.sh
+
   release:
+    needs: boundaries
     permissions:
       contents: write
     uses: quizup-organization/quizup-reusable-workflows/.github/workflows/mobile-release.yml@main

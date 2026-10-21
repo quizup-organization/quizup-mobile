@@ -1,12 +1,7 @@
 import { Icon, Row, Spacer } from "@expo/ui";
 
-import { icons, type IconKey } from "@/components/icons";
-import { useThemeColor } from "@/hooks/use-theme-color";
-
-const tileSurface = {
-  light: "#eee",
-  dark: "rgba(255,255,255,0.1)",
-};
+import { icons, type IconKey } from "@/components/fragments/icons";
+import { useNativeColors } from "@/theme";
 
 /** Tuile d'icône colorée. */
 export function AppIconTile({
@@ -20,8 +15,7 @@ export function AppIconTile({
   background?: string;
   color?: string;
 }) {
-  const defaultBackground = useThemeColor(tileSurface, "background");
-  const tint = useThemeColor({}, "tint");
+  const colors = useNativeColors();
 
   return (
     <Row
@@ -30,14 +24,14 @@ export function AppIconTile({
         width: size,
         height: size,
         borderRadius: 3,
-        backgroundColor: background ?? defaultBackground,
+        backgroundColor: background ?? colors.fill,
       }}
     >
       <Spacer flexible />
       <Icon
         name={icons[name]}
         size={Math.round(size / 2.2)}
-        color={color ?? tint}
+        color={color ?? colors.accent}
       />
       <Spacer flexible />
     </Row>

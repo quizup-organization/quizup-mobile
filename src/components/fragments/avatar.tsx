@@ -1,11 +1,6 @@
 import { Row, Spacer, Text } from "@expo/ui";
 
-import { useThemeColor } from "@/hooks/use-theme-color";
-
-const avatarSurface = {
-  light: "#eee",
-  dark: "rgba(255,255,255,0.1)",
-};
+import { useNativeColors } from "@/theme";
 
 export function AppAvatar({
   initials,
@@ -14,8 +9,7 @@ export function AppAvatar({
   initials: string;
   size?: number;
 }) {
-  const background = useThemeColor(avatarSurface, "background");
-  const tint = useThemeColor({}, "tint");
+  const colors = useNativeColors();
 
   return (
     <Row
@@ -24,7 +18,7 @@ export function AppAvatar({
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: background,
+        backgroundColor: colors.fill,
       }}
     >
       <Spacer flexible />
@@ -32,7 +26,7 @@ export function AppAvatar({
         textStyle={{
           fontSize: Math.round(size / 2.8),
           fontWeight: "700",
-          color: tint,
+          color: colors.accent,
         }}
       >
         {initials}

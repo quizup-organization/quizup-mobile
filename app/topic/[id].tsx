@@ -1,4 +1,3 @@
-import { Column, Row, Spacer } from "@expo/ui";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 
@@ -9,13 +8,14 @@ import {
   AppIcon,
   AppIconTile,
   AppText,
-  Block,
+  Column,
   ProgressBar,
+  Row,
   Screen,
   Section,
+  Spacer,
 } from "@/components";
 import { findTopic } from "@/data/fixtures";
-import { useContentWidth } from "@/hooks/use-content-width";
 
 const AGENDA = [
   "Questions à choix unique, 15 secondes par question",
@@ -27,45 +27,40 @@ export default function TopicDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const topic = findTopic(id);
-  const contentWidth = useContentWidth();
   const [started, setStarted] = useState(false);
 
   if (!topic) {
     return (
       <Screen>
-        <Block>
+        <Section>
           <Column spacing={8}>
             <AppText variant="title">Sujet introuvable</AppText>
             <AppText variant="body" tone="muted">
               Ce sujet n'existe pas dans cette démo.
             </AppText>
           </Column>
-        </Block>
-        <Block>
-          <Row spacing={8} alignment="center">
-            <AppButton
-              label="Retour"
-              variant="text"
-              onPress={() => router.back()}
-            />
-          </Row>
-        </Block>
+        </Section>
+        <Row spacing={8} alignment="center">
+          <AppButton
+            label="Retour"
+            variant="text"
+            onPress={() => router.back()}
+          />
+        </Row>
       </Screen>
     );
   }
 
   return (
     <Screen>
-      <Block>
-        <Row spacing={8} alignment="center" onPress={() => router.back()}>
-          <AppIcon name="back" size={18} tone="accent" />
-          <AppText variant="label" tone="accent">
-            Retour
-          </AppText>
-        </Row>
-      </Block>
+      <Row spacing={8} alignment="center" onPress={() => router.back()}>
+        <AppIcon name="back" size={18} tone="accent" />
+        <AppText variant="label" tone="accent">
+          Retour
+        </AppText>
+      </Row>
 
-      <Block>
+      <Section>
         <AppCard>
           <Row spacing={14} alignment="center">
             <AppIconTile
@@ -91,9 +86,9 @@ export default function TopicDetailScreen() {
             {topic.blurb}
           </AppText>
         </AppCard>
-      </Block>
+      </Section>
 
-      <Block>
+      <Section>
         <AppCard>
           <Row spacing={8} alignment="center">
             <AppText variant="label">Maîtrise</AppText>
@@ -103,10 +98,10 @@ export default function TopicDetailScreen() {
             </AppText>
           </Row>
           <Row alignment="center">
-            <ProgressBar value={topic.mastery} width={contentWidth - 30} />
+            <ProgressBar value={topic.mastery} />
           </Row>
         </AppCard>
-      </Block>
+      </Section>
 
       <Section title="Au programme">
         <Column spacing={8}>
@@ -121,25 +116,23 @@ export default function TopicDetailScreen() {
         </Column>
       </Section>
 
-      <Block>
-        <Row spacing={8} alignment="center">
-          <AppButton
-            label={started ? "Terminer la démo" : "Jouer une partie démo"}
-            onPress={() => setStarted((value) => !value)}
-          />
-          <Spacer flexible />
-        </Row>
-      </Block>
+      <Row spacing={8} alignment="center">
+        <AppButton
+          label={started ? "Terminer la démo" : "Jouer une partie démo"}
+          onPress={() => setStarted((value) => !value)}
+        />
+        <Spacer flexible />
+      </Row>
 
       {started ? (
-        <Block>
+        <Section>
           <AppCard>
             <AppText variant="heading">Partie simulée</AppText>
             <AppText variant="caption" tone="muted">
               {`5 questions · ${topic.name} — aucune donnée réelle, aucun appel réseau.`}
             </AppText>
           </AppCard>
-        </Block>
+        </Section>
       ) : null}
     </Screen>
   );

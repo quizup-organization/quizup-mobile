@@ -1,15 +1,10 @@
 import { Column } from "@expo/ui";
 import type { ReactNode } from "react";
 
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useScreenWidth } from "@/components/screen";
+import { useNativeColors } from "@/theme";
 
-/** Surface secondaire du template (`codeHighlightContainer`). */
-const surfaceColor = {
-  light: "rgba(0,0,0,0.05)",
-  dark: "rgba(255,255,255,0.05)",
-};
-
-/** Carte de contenu : surface du template, sans bordure. */
+/** Carte de contenu : surface native, sans bordure. */
 export function AppCard({
   children,
   onPress,
@@ -19,16 +14,17 @@ export function AppCard({
   onPress?: () => void;
   width?: number;
 }) {
-  const background = useThemeColor(surfaceColor, "background");
+  const colors = useNativeColors();
+  const screenWidth = useScreenWidth();
 
   return (
     <Column
       spacing={8}
       onPress={onPress}
       style={{
-        width,
+        width: width ?? screenWidth,
         padding: 15,
-        backgroundColor: background,
+        backgroundColor: colors.surface,
         borderRadius: 3,
       }}
     >

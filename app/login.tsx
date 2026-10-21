@@ -1,5 +1,3 @@
-import { Column, Row, Spacer } from "@expo/ui";
-import type { TextInputRef } from "@expo/ui";
 import * as Linking from "expo-linking";
 import { useEffect, useRef, useState } from "react";
 
@@ -8,8 +6,11 @@ import {
   AppSocialButton,
   AppText,
   AppTextField,
-  Block,
+  Column,
+  Row,
   Screen,
+  Spacer,
+  type TextInputRef,
 } from "@/components";
 import { isFacebookConfigured, isGoogleConfigured } from "@/auth/config";
 import {
@@ -194,161 +195,164 @@ export default function LoginScreen() {
     pending === "facebook" ? "Connexion..." : "Continuer avec Facebook";
 
   return (
-    <Screen>
-      <Block width={formWidth}>
-        <Column spacing={6} alignment="center">
-          <AppText variant="display">QuizUp</AppText>
-          <AppText variant="body" tone="muted" align="center" width={formWidth}>
-            Connecte-toi pour jouer
-          </AppText>
-        </Column>
-      </Block>
+    <Screen align="center">
+      <Column spacing={6} alignment="center" style={{ width: formWidth }}>
+        <AppText variant="display">QuizUp</AppText>
+        <AppText variant="body" tone="muted" align="center" width={formWidth}>
+          Connecte-toi pour jouer
+        </AppText>
+      </Column>
 
-      <Block width={formWidth}>
-        <Column spacing={12}>
-          {step === "email" ? (
-            <>
-              <AppTextField
-                ref={emailRef}
-                defaultValue={email}
-                placeholder="ton@email.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                autoComplete="email"
-                returnKeyType="send"
-                onSubmitEditing={handleRequestCode}
-                onChangeText={setEmail}
-                editable={!isBusy}
-                style={{ width: formWidth }}
-              />
-              <AppButton
-                label={isRequestingCode ? "Envoi..." : "Recevoir un code"}
-                onPress={handleRequestCode}
-                disabled={!isEmailValid || isBusy}
-                style={{ width: formWidth }}
-              />
-            </>
-          ) : (
-            <>
-              <AppText variant="caption" tone="muted" align="center" width={formWidth}>
-                {`Code envoyé à ${email}`}
-              </AppText>
-              <AppTextField
-                ref={codeRef}
-                defaultValue=""
-                placeholder="000000"
-                keyboardType="number-pad"
-                autoComplete="one-time-code"
-                textAlign="center"
-                maxLength={6}
-                autoFocus
-                onChangeText={(value) =>
-                  setCode(value.replace(/\D/g, "").slice(0, 6))
-                }
-                editable={!isBusy}
-                style={{ width: formWidth }}
-                textStyle={{
-                  fontSize: 28,
-                  fontWeight: "700",
-                  letterSpacing: 6,
-                }}
-              />
-              <AppButton
-                label={isSubmittingCode ? "Connexion..." : "Se connecter"}
-                onPress={handleLoginCode}
-                disabled={!isCodeValid || isBusy}
-                style={{ width: formWidth }}
-              />
-              <Row spacing={8} alignment="center" style={{ width: formWidth }}>
-                <AppButton
-                  variant="text"
-                  label={
-                    isRequestingCode
-                      ? "Envoi..."
-                      : resendIn > 0
-                        ? `Renvoyer (${resendIn} s)`
-                        : "Renvoyer le code"
-                  }
-                  onPress={handleResend}
-                  disabled={resendIn > 0 || isBusy}
-                />
-                <Spacer flexible />
-                <AppButton
-                  variant="text"
-                  label="Changer d'email"
-                  onPress={handleChangeEmail}
-                  disabled={isBusy}
-                />
-              </Row>
-            </>
-          )}
-        </Column>
-      </Block>
-
-      <Block width={formWidth}>
-        <Column spacing={12}>
-          <AppText variant="caption" tone="muted" align="center" width={formWidth}>
-            ou continuer avec
-          </AppText>
-          <AppSocialButton
-            badge="G"
-            badgeColor="#4285F4"
-            label={googleLabel}
-            onPress={handleGoogle}
-            disabled={isBusy || !isGoogleConfigured}
-            style={{ width: formWidth }}
-          />
-          <AppSocialButton
-            badge="f"
-            badgeColor="#1877F2"
-            label={facebookLabel}
-            onPress={handleFacebook}
-            disabled={isBusy || !isFacebookConfigured}
-            style={{ width: formWidth }}
-          />
-          {__DEV__ && (!isGoogleConfigured || !isFacebookConfigured) ? (
-            <AppText variant="caption" tone="muted" align="center" width={formWidth}>
-              Google/Facebook non configurés dans ce build.
+      <Column spacing={12} style={{ width: formWidth }}>
+        {step === "email" ? (
+          <>
+            <AppTextField
+              ref={emailRef}
+              defaultValue={email}
+              placeholder="ton@email.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              returnKeyType="send"
+              onSubmitEditing={handleRequestCode}
+              onChangeText={setEmail}
+              editable={!isBusy}
+              style={{ width: formWidth }}
+            />
+            <AppButton
+              label={isRequestingCode ? "Envoi..." : "Recevoir un code"}
+              onPress={handleRequestCode}
+              disabled={!isEmailValid || isBusy}
+              style={{ width: formWidth }}
+            />
+          </>
+        ) : (
+          <>
+            <AppText
+              variant="caption"
+              tone="muted"
+              align="center"
+              width={formWidth}
+            >
+              {`Code envoyé à ${email}`}
             </AppText>
-          ) : null}
-        </Column>
-      </Block>
+            <AppTextField
+              ref={codeRef}
+              defaultValue=""
+              placeholder="000000"
+              keyboardType="number-pad"
+              autoComplete="one-time-code"
+              textAlign="center"
+              maxLength={6}
+              autoFocus
+              onChangeText={(value) =>
+                setCode(value.replace(/\D/g, "").slice(0, 6))
+              }
+              editable={!isBusy}
+              style={{ width: formWidth }}
+              textStyle={{
+                fontSize: 28,
+                fontWeight: "700",
+                letterSpacing: 6,
+              }}
+            />
+            <AppButton
+              label={isSubmittingCode ? "Connexion..." : "Se connecter"}
+              onPress={handleLoginCode}
+              disabled={!isCodeValid || isBusy}
+              style={{ width: formWidth }}
+            />
+            <Row spacing={8} alignment="center" style={{ width: formWidth }}>
+              <AppButton
+                variant="text"
+                label={
+                  isRequestingCode
+                    ? "Envoi..."
+                    : resendIn > 0
+                      ? `Renvoyer (${resendIn} s)`
+                      : "Renvoyer le code"
+                }
+                onPress={handleResend}
+                disabled={resendIn > 0 || isBusy}
+              />
+              <Spacer flexible />
+              <AppButton
+                variant="text"
+                label="Changer d'email"
+                onPress={handleChangeEmail}
+                disabled={isBusy}
+              />
+            </Row>
+          </>
+        )}
+      </Column>
+
+      <Column spacing={12} style={{ width: formWidth }}>
+        <AppText
+          variant="caption"
+          tone="muted"
+          align="center"
+          width={formWidth}
+        >
+          ou continuer avec
+        </AppText>
+        <AppSocialButton
+          badge="G"
+          badgeColor="#4285F4"
+          label={googleLabel}
+          onPress={handleGoogle}
+          disabled={isBusy || !isGoogleConfigured}
+          style={{ width: formWidth }}
+        />
+        <AppSocialButton
+          badge="f"
+          badgeColor="#1877F2"
+          label={facebookLabel}
+          onPress={handleFacebook}
+          disabled={isBusy || !isFacebookConfigured}
+          style={{ width: formWidth }}
+        />
+        {__DEV__ && (!isGoogleConfigured || !isFacebookConfigured) ? (
+          <AppText
+            variant="caption"
+            tone="muted"
+            align="center"
+            width={formWidth}
+          >
+            Google/Facebook non configurés dans ce build.
+          </AppText>
+        ) : null}
+      </Column>
 
       {error ? (
-        <Block width={formWidth}>
-          <AppText variant="caption" align="center" width={formWidth}>
-            {error}
-          </AppText>
-        </Block>
+        <AppText variant="caption" tone="danger" align="center" width={formWidth}>
+          {error}
+        </AppText>
       ) : null}
 
-      <Block width={formWidth}>
-        <Row spacing={18} alignment="center" style={{ width: formWidth }}>
-          <Spacer flexible />
-          <AppText
-            variant="caption"
-            tone="muted"
-            onPress={() => {
-              void Linking.openURL(
-                "https://app.quizup.cnadjim.fr/privacy.html",
-              );
-            }}
-          >
-            Confidentialité
-          </AppText>
-          <AppText
-            variant="caption"
-            tone="muted"
-            onPress={() => {
-              void Linking.openURL("https://app.quizup.cnadjim.fr/terms.html");
-            }}
-          >
-            Conditions
-          </AppText>
-          <Spacer flexible />
-        </Row>
-      </Block>
+      <Row spacing={18} alignment="center" style={{ width: formWidth }}>
+        <Spacer flexible />
+        <AppText
+          variant="caption"
+          tone="muted"
+          onPress={() => {
+            void Linking.openURL("https://app.quizup.cnadjim.fr/privacy.html");
+          }}
+        >
+          Confidentialité
+        </AppText>
+        <AppText
+          variant="caption"
+          tone="muted"
+          onPress={() => {
+            void Linking.openURL("https://app.quizup.cnadjim.fr/terms.html");
+          }}
+        >
+          Conditions
+        </AppText>
+        <Spacer flexible />
+      </Row>
     </Screen>
   );
 }

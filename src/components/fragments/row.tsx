@@ -1,9 +1,9 @@
 import { Column, Row, Spacer } from "@expo/ui";
 
-import { AppIcon } from "@/components/icon";
-import { AppIconTile } from "@/components/icon-tile";
-import type { IconKey } from "@/components/icons";
-import { AppText } from "@/components/text";
+import { AppIcon } from "@/components/fragments/icon";
+import { AppIconTile } from "@/components/fragments/icon-tile";
+import type { IconKey } from "@/components/fragments/icons";
+import { AppText } from "@/components/fragments/text";
 
 /** Ligne de liste native : icône + titre + sous-titre + chevron. */
 export function AppRow({

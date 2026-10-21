@@ -5,5 +5,12 @@ on:
     branches: [main]
 
 jobs:
+  boundaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Vérifie les frontières natives
+        run: sh scripts/check-native-boundaries.sh
+
   ci:
     uses: quizup-organization/quizup-reusable-workflows/.github/workflows/mobile-ci.yml@main

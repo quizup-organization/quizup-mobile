@@ -1,6 +1,6 @@
 import { Text } from "@expo/ui";
 
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useNativeColors } from "@/theme";
 
 /**
  * Échelle typographique interne au composant : elle n'est pas exportée comme un
@@ -15,7 +15,12 @@ export type TextVariant =
   | "label"
   | "caption";
 
-export type TextTone = "default" | "muted" | "accent" | "onAccent";
+export type TextTone =
+  | "default"
+  | "muted"
+  | "accent"
+  | "onAccent"
+  | "danger";
 
 const typography = {
   display: { fontSize: 34, fontWeight: "800" },
@@ -25,14 +30,6 @@ const typography = {
   label: { fontSize: 15, fontWeight: "600" },
   caption: { fontSize: 14, lineHeight: 20, fontWeight: "400" },
 } as const;
-
-/** Texte secondaire du template Expo (`EditScreenInfo`). */
-const mutedColor = {
-  light: "rgba(0,0,0,0.8)",
-  dark: "rgba(255,255,255,0.8)",
-};
-
-const emptyColor = {};
 
 export function AppText({
   children,
@@ -51,10 +48,17 @@ export function AppText({
   onPress?: () => void;
   width?: number;
 }) {
-  const color = useThemeColor(
-    tone === "muted" ? mutedColor : emptyColor,
-    tone === "accent" ? "tint" : tone === "onAccent" ? "background" : "text",
-  );
+  const colors = useNativeColors();
+  const color =
+    tone === "muted"
+      ? colors.textSecondary
+      : tone === "accent"
+        ? colors.accent
+        : tone === "onAccent"
+          ? colors.onAccent
+          : tone === "danger"
+            ? colors.danger
+            : colors.text;
 
   return (
     <Text
