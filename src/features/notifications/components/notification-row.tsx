@@ -26,6 +26,7 @@ const NOTIFICATION_ICONS: Record<NotificationType, IconKey> = {
   ROOM_ACCEPTED: "play",
   WIZZ: "bolt",
   QUESTION_REPORTED: "medal",
+  TOPIC_DRAFTED: "medal",
   ACCOUNT_SUSPENDED: "settings",
 };
 

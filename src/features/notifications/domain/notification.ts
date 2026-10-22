@@ -6,6 +6,7 @@ export type NotificationType =
   | "ROOM_ACCEPTED"
   | "WIZZ"
   | "QUESTION_REPORTED"
+  | "TOPIC_DRAFTED"
   | "ACCOUNT_SUSPENDED";
 
 /** Vue d'une notification personnelle (REST + push). */
@@ -43,7 +44,10 @@ export function notificationIntent(
   notification: NotificationView,
 ): NotificationIntent {
   if (notification.type === "ACCOUNT_SUSPENDED") return null;
-  if (notification.type === "QUESTION_REPORTED") {
+  if (
+    notification.type === "QUESTION_REPORTED" ||
+    notification.type === "TOPIC_DRAFTED"
+  ) {
     return notification.topicId
       ? { kind: "topic", id: notification.topicId }
       : null;
@@ -71,6 +75,8 @@ export function notificationLabel(
       return `${actorName} te relance`;
     case "QUESTION_REPORTED":
       return "Une question a été signalée";
+    case "TOPIC_DRAFTED":
+      return "Ton sujet est repassé en brouillon";
     case "ACCOUNT_SUSPENDED":
       return "Ton compte a été suspendu";
     default:
