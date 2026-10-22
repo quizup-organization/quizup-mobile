@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.4.0...v1.5.0) (2026-10-22)
+
+### Features
+
+* **notifications:** prend en charge le sujet repassé en brouillon ([61c7f84](https://github.com/quizup-organization/quizup-mobile/commit/61c7f847dbd131e8bbc9ce4e822cd0081838727f))
+
 ## [1.4.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.3.0...v1.4.0) (2026-10-21)
 
 ### Features
