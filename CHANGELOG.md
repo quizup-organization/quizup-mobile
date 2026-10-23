@@ -1,3 +1,9 @@
+## [1.11.1](https://github.com/quizup-organization/quizup-mobile/compare/v1.11.0...v1.11.1) (2026-10-23)
+
+### Bug Fixes
+
+* **mobile:** ajuste les formulaires profil et social ([5e0df1f](https://github.com/quizup-organization/quizup-mobile/commit/5e0df1fba2574e07fb1a3d62e1a07f333bc356df))
+
 ## [1.11.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.10.0...v1.11.0) (2026-10-23)
 
 ### Features
