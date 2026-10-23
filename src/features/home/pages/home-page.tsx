@@ -1,15 +1,21 @@
 import { useRouter } from "expo-router";
 
 import {
+  AppCard,
+  AppText,
   Carousel,
   Column,
+  Row,
   Screen,
   Section,
-  AppText,
+  Spacer,
 } from "@/components";
+import { useActiveGames } from "@/features/game/hooks/use-active-games";
 import { useHome } from "@/features/home/hooks/use-home";
 import { useMe } from "@/features/profile/hooks/use-me";
 import { TopicCard } from "@/features/topics/components/topic-card";
+import { TopicEmoji } from "@/features/topics/components/topic-emoji";
+import { topicName } from "@/features/topics/domain/topic";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
@@ -18,10 +24,12 @@ export function HomePage() {
   const router = useRouter();
   const home = useHome();
   const me = useMe();
+  const activeGames = useActiveGames();
 
   const refetch = () => {
     void home.refetch();
     void me.refetch();
+    void activeGames.refetch();
   };
 
   if (home.isLoading || me.isLoading) {
@@ -68,6 +76,50 @@ export function HomePage() {
           Prêt pour ta session du jour ?
         </AppText>
       </Column>
+
+      {activeGames.data && activeGames.data.length > 0 ? (
+        <Section title="Reprendre">
+          <Column spacing={8}>
+            {activeGames.data.slice(0, 2).map((game) => {
+              const name = topicName(
+                game.topic.names,
+                language,
+                game.topic.topicId,
+              );
+              const opponent =
+                game.opponent?.pseudonym ??
+                (game.opponentType === "BOT" ? "Bot" : "Adversaire");
+              return (
+                <AppCard
+                  key={game.gameId}
+                  onPress={() => router.push(`/games/${game.gameId}`)}
+                  accessibilityLabel={`Reprendre la partie ${name}`}
+                >
+                  <Row spacing={12} alignment="center">
+                    <TopicEmoji
+                      emoji={game.topic.emoji}
+                      color={game.topic.color}
+                      size={38}
+                    />
+                    <Column spacing={2}>
+                      <AppText variant="label" numberOfLines={1}>
+                        {name}
+                      </AppText>
+                      <AppText variant="caption" tone="muted">
+                        {`Contre ${opponent}`}
+                      </AppText>
+                    </Column>
+                    <Spacer flexible />
+                    <AppText variant="caption" tone="accent">
+                      Reprendre
+                    </AppText>
+                  </Row>
+                </AppCard>
+              );
+            })}
+          </Column>
+        </Section>
+      ) : null}
 
       {empty || !data ? (
         <EmptyState

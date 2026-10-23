@@ -3,12 +3,12 @@ import { ENDPOINTS } from "@/lib/endpoints";
 import { isMockData } from "@/lib/config";
 import { meService } from "@/features/profile/lib/me";
 import type { UserRef } from "@/features/player/domain/profile";
+import type { RoomView } from "@/features/rooms/domain/room";
 import type { TopicRef } from "@/features/topics/domain/topic";
 import type {
   ChallengeStatus,
   ChallengesSnapshot,
   PendingChallenge,
-  RoomStatus,
   RoomSummary,
 } from "../domain/challenge";
 import { challengesService as mockChallengesService } from "./challenges.mock";
@@ -23,21 +23,6 @@ interface ChallengeView {
   gameId: string | null;
   createdAt: string;
   expiresAt: string;
-}
-
-interface RoomView {
-  roomId: string;
-  topic: TopicRef;
-  status: RoomStatus;
-  vsBot: boolean;
-  canCancel: boolean;
-  opponent: UserRef | null;
-  initiatorPresent: boolean;
-  participantPresent: boolean;
-  gameId: string | null;
-  createdAt: string;
-  expiresAt: string;
-  updatedAt: string;
 }
 
 const UNKNOWN_PLAYER: UserRef = {

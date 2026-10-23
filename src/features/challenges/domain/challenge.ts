@@ -1,4 +1,5 @@
 import type { UserRef } from "@/features/player/domain/profile";
+import type { RoomStatus } from "@/features/rooms/domain/room";
 import type { TopicRef } from "@/features/topics/domain/topic";
 
 export type ChallengeDirection = "received" | "sent";
@@ -19,18 +20,6 @@ export interface PendingChallenge {
   expiresAt: string;
   status: ChallengeStatus;
 }
-
-export type RoomStatus =
-  | "WAITING_PLAYERS"
-  | "FETCHING_PLAYERS"
-  | "FETCHING_PLAYED_QUESTIONS"
-  | "FETCHING_QUESTIONS"
-  | "CREATING_GAME"
-  | "GAME_CREATED"
-  | "COMPLETED"
-  | "CANCELLED"
-  | "EXPIRED"
-  | "FAILED";
 
 /** Résumé de salle (`RoomView` réduit à ce que l'onglet Défis affiche). */
 export interface RoomSummary {

@@ -647,7 +647,7 @@ export function setFollowPlayer(userId: string, followed: boolean): void {
   db.me.followingCount += followed ? 1 : -1;
 }
 
-export function leaderboardFor(topicId: string): LeaderboardEntry[] {
+export function leaderboardFor(_topicId: string): LeaderboardEntry[] {
   const me = db.me;
   const entries: LeaderboardEntry[] = db.profiles
     .slice(0, 5)

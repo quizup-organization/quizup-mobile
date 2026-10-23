@@ -31,6 +31,17 @@ export const queryKeys = {
       params: PeopleParams,
     ) => ["profiles", "people", userId, direction, params] as const,
   },
+  rooms: {
+    all: ["rooms"] as const,
+    detail: (roomId: string) => ["rooms", "detail", roomId] as const,
+  },
+  games: {
+    all: ["games"] as const,
+    active: () => ["games", "active"] as const,
+    notifications: (gameId: string) =>
+      ["games", "notifications", gameId] as const,
+    result: (gameId: string) => ["games", "result", gameId] as const,
+  },
   notifications: {
     all: ["notifications"] as const,
     list: (params: { unreadOnly: boolean; page: number; size: number }) =>

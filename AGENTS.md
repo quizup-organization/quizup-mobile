@@ -16,11 +16,14 @@ Application mobile QuizUp :
 - **Défis** : défis reçus/envoyés + salons, badge « pending ».
 - Fiche sujet (`/topics/[id]`), fiche joueur (`/players/[id]`), réglages (`/settings`),
   recherche globale (`/search`).
+- **Duel bot natif** : `POST /api/rooms/bot` depuis la fiche sujet, salon de préparation
+  (`/rooms/[id]`), arène (`/games/[id]`) et résultat (`/games/[id]/result`) ; reprise
+  d'une partie active depuis l'accueil.
 - **Login** OTP / Google / Facebook ; en mode démo, une session factice est créée.
 - Données BFF réelles ; mocks disponibles uniquement en mode démo local.
 
-Hors périmètre immédiat : duel/arène réel, temps réel STOMP, upload média, rédaction
-de questions, push OS, i18n complète.
+Hors périmètre immédiat : duel humain/appariement public, temps réel STOMP, upload
+média, rédaction de questions, push OS, i18n complète.
 
 ---
 
@@ -48,6 +51,9 @@ app/
   search.tsx                  # recherche sujets/joueurs
   topics/[id].tsx             # fiche sujet (root stack)
   players/[id].tsx            # fiche joueur (root stack)
+  rooms/[id].tsx              # salon de préparation
+  games/[id]/index.tsx        # arène de duel
+  games/[id]/result.tsx       # résultat du duel
   (tabs)/
     _layout.tsx               # NativeTabs : 5 onglets + badge Défis
     (home)/_layout.tsx + index.tsx
@@ -67,6 +73,8 @@ src/
     social/                   # hooks, pages (annuaire)
     profile/                  # domain, lib, hooks, pages
     challenges/               # domain, lib, hooks, pages (défis + salons)
+    rooms/                    # domain, lib, hooks, pages (préparation de salle)
+    game/                     # domain (fold notifications), lib, hooks, pages (arène + résultat)
     settings/                 # domain (accents), pages
     search/                   # pages
     notifications/            # domain, lib, hooks, components, pages
@@ -108,7 +116,11 @@ src/
     un composant par fichier ; fichiers en kebab-case.
 11. **IA** : 5 onglets (Accueil, Sujets, Social, Défis, Profil) ; notifications par la
     cloche ; détails sur le root stack (tab bar masquée) ; headers natifs ; badge
-    Défis = défis reçus + salons en attente ; badge cloche = non-lus.
+    Défis = défis reçus + salons en attente ; badge cloche = non-lus. Le duel bot
+    enchaîne fiche sujet → salon → arène → résultat ; l'arène masque le header et
+    désactive le geste de retour (sortie par abandon confirmé). L'arène rejoue
+    l'historique REST des notifications toutes les 500 ms ; le push STOMP viendra
+    remplacer ce polling sans changer le fold `GameState`.
 12. **Mode réel par défaut** : `EXPO_PUBLIC_AUTH_MODE=identity` et
     `EXPO_PUBLIC_DATA_SOURCE=api`. Pour la démo locale uniquement, forcer les deux à
     `mock` ; `EXPO_PUBLIC_MOCK_SCENARIO=success|empty|error`. Chaque service a alors

@@ -27,6 +27,19 @@ export const ENDPOINTS = {
   },
   rooms: {
     mine: "/api/rooms/mine",
+    bot: "/api/rooms/bot",
+    detail: (roomId: string) => `/api/rooms/${roomId}`,
+    join: (roomId: string) => `/api/rooms/${roomId}/join`,
+    leave: (roomId: string) => `/api/rooms/${roomId}/leave`,
+    cancel: (roomId: string) => `/api/rooms/${roomId}/cancel`,
+  },
+  games: {
+    active: "/api/games",
+    answer: (gameId: string) => `/api/games/${gameId}/answer`,
+    abandon: (gameId: string) => `/api/games/${gameId}/abandon`,
+    result: (gameId: string) => `/api/games/${gameId}/result`,
+    notifications: (gameId: string) =>
+      `/api/games/${gameId}/notifications`,
   },
   notifications: {
     list: "/api/notifications",

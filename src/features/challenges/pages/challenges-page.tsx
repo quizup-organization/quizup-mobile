@@ -1,3 +1,5 @@
+import { useRouter } from "expo-router";
+
 import {
   AppAvatar,
   AppButton,
@@ -17,6 +19,7 @@ import {
   useChallenges,
   useRespondChallenge,
 } from "@/features/challenges/hooks/use-challenges";
+import { ROOM_STATUS_LABELS } from "@/features/rooms/domain/room";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { topicName } from "@/features/topics/domain/topic";
 import { EmptyState } from "@/shared/components/empty-state";
@@ -99,12 +102,18 @@ function SentChallengeCard({ challenge }: { challenge: PendingChallenge }) {
   );
 }
 
-function RoomCard({ room }: { room: RoomSummary }) {
+function RoomCard({
+  room,
+  onPress,
+}: {
+  room: RoomSummary;
+  onPress: () => void;
+}) {
   const opponent = room.opponent?.pseudonym ?? "Bot";
   const name = topicName(room.topic.names, "fr", room.topic.topicId);
 
   return (
-    <AppCard>
+    <AppCard onPress={onPress} accessibilityLabel={`Ouvrir la salle ${name}`}>
       <Row spacing={12} alignment="center">
         <TopicEmoji
           emoji={room.topic.emoji}
@@ -116,15 +125,20 @@ function RoomCard({ room }: { room: RoomSummary }) {
             {name}
           </AppText>
           <AppText variant="caption" tone="muted">
-            {`${opponent} · ${room.status === "WAITING_PLAYERS" ? "En attente" : room.status}`}
+            {`${opponent} · ${ROOM_STATUS_LABELS[room.status]}`}
           </AppText>
         </Column>
+        <Spacer flexible />
+        <AppText variant="caption" tone="accent">
+          Ouvrir
+        </AppText>
       </Row>
     </AppCard>
   );
 }
 
 export function ChallengesPage() {
+  const router = useRouter();
   const challenges = useChallenges();
   const respond = useRespondChallenge();
 
@@ -206,7 +220,11 @@ export function ChallengesPage() {
         ) : (
           <Column spacing={10}>
             {rooms.map((room) => (
-              <RoomCard key={room.roomId} room={room} />
+              <RoomCard
+                key={room.roomId}
+                room={room}
+                onPress={() => router.push(`/rooms/${room.roomId}`)}
+              />
             ))}
           </Column>
         )}

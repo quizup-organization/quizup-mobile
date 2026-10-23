@@ -12,29 +12,19 @@ import {
   Section,
   Spacer,
 } from "@/components";
+import { useCreateBotRoom } from "@/features/rooms/hooks/use-create-bot-room";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
+import { masteryGradeLabel } from "@/features/topics/domain/mastery";
 import { topicName } from "@/features/topics/domain/topic";
 import { useSetTopicFollow } from "@/features/topic/hooks/use-set-topic-follow";
 import { useTopicLeaderboard } from "@/features/topic/hooks/use-topic-leaderboard";
 import { useTopicOverview } from "@/features/topic/hooks/use-topic-overview";
 import { useMe } from "@/features/profile/hooks/use-me";
+import { isMockData } from "@/lib/config";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 import { formatNumber, initials } from "@/shared/utils/format";
-
-const GRADE_LABELS: Record<string, string> = {
-  APPRENTI: "Apprenti",
-  PRATIQUANT: "Praticien",
-  CONFIRME: "Confirmé",
-  EXPERT: "Expert",
-  MAITRE: "Maître",
-};
-
-function gradeLabel(grade: string | null | undefined): string {
-  if (!grade) return "Non classé";
-  return GRADE_LABELS[grade] ?? grade;
-}
 
 export function TopicPage() {
   const router = useRouter();
@@ -45,6 +35,7 @@ export function TopicPage() {
   const overview = useTopicOverview(topicId);
   const leaderboard = useTopicLeaderboard(topicId, { size: 5 });
   const follow = useSetTopicFollow(topicId);
+  const createBotRoom = useCreateBotRoom();
 
   const refetch = () => {
     void overview.refetch();
@@ -123,6 +114,30 @@ export function TopicPage() {
               {topic.description ?? "Aucune description pour ce sujet."}
             </AppText>
 
+            <Row spacing={10} alignment="center">
+              <AppButton
+                label={
+                  createBotRoom.isPending ? "Préparation…" : "Lancer un duel bot"
+                }
+                disabled={createBotRoom.isPending || isMockData}
+                onPress={() =>
+                  createBotRoom.mutate(topicId, {
+                    onSuccess: (room) => router.push(`/rooms/${room.id}`),
+                  })
+                }
+              />
+              {isMockData ? (
+                <AppText variant="caption" tone="muted">
+                  Disponible en mode connecté
+                </AppText>
+              ) : null}
+            </Row>
+            {createBotRoom.isError ? (
+              <AppText variant="caption" tone="danger">
+                Impossible de préparer le duel. Réessaie.
+              </AppText>
+            ) : null}
+
             <Row spacing={12} alignment="center">
               <AppText variant="caption" tone="muted">
                 {`${formatNumber(topic.followersCount)} abonnés`}
@@ -143,12 +158,12 @@ export function TopicPage() {
           <AppCard>
             <Row spacing={8} alignment="center">
               <AppText variant="label">
-                {`${gradeLabel(progress.grade)} · ${formatNumber(progress.xp)} XP`}
+                {`${masteryGradeLabel(progress.grade)} · ${formatNumber(progress.xp)} XP`}
               </AppText>
               <Spacer flexible />
               <AppText variant="caption" tone="muted">
                 {progress.nextGrade
-                  ? `Vers ${gradeLabel(progress.nextGrade)}`
+                  ? `Vers ${masteryGradeLabel(progress.nextGrade)}`
                   : "Grade maximal"}
               </AppText>
             </Row>
@@ -229,9 +244,6 @@ export function TopicPage() {
           )}
         </Section>
 
-        <AppText variant="caption" tone="muted" align="center">
-          Les duels et salles arrivent dans une prochaine étape.
-        </AppText>
       </Screen>
     </>
   );

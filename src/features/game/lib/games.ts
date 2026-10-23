@@ -1,0 +1,33 @@
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/endpoints";
+import type { EventEnvelope } from "@/shared/types/api";
+import type {
+  ActiveGameView,
+  GameChoice,
+  GameResultView,
+} from "../domain/game-dto";
+import type { GameNotification } from "../domain/game-notification";
+
+/** Arène : réponse, abandon, résultat et historique de notifications. */
+export const gamesService = {
+  active: (): Promise<ActiveGameView[]> =>
+    api.get<ActiveGameView[]>(ENDPOINTS.games.active, {
+      params: { active: true },
+    }),
+
+  answer: (gameId: string, choice: GameChoice): Promise<void> =>
+    api.post<void>(ENDPOINTS.games.answer(gameId), { choice }),
+
+  abandon: (gameId: string): Promise<void> =>
+    api.post<void>(ENDPOINTS.games.abandon(gameId)),
+
+  result: (gameId: string): Promise<GameResultView> =>
+    api.get<GameResultView>(ENDPOINTS.games.result(gameId)),
+
+  notifications: (
+    gameId: string,
+  ): Promise<EventEnvelope<GameNotification>[]> =>
+    api.get<EventEnvelope<GameNotification>[]>(
+      ENDPOINTS.games.notifications(gameId),
+    ),
+};

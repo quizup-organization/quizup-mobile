@@ -8,5 +8,5 @@ export type {
   ChallengeStatus,
   PendingChallenge,
   RoomSummary,
-  RoomStatus,
 } from "@/features/challenges/domain/challenge";
+export type { RoomStatus } from "@/features/rooms/domain/room";
