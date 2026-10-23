@@ -183,3 +183,16 @@ export function foldGame(
       return applyGameNotification(state, envelope.payload);
     }, emptyGame(gameId));
 }
+
+/** Fusionne une trame live dans l'historique en dédupliquant par séquence. */
+export function mergeGameEnvelope(
+  envelopes: EventEnvelope<GameNotification>[],
+  incoming: EventEnvelope<GameNotification>,
+): EventEnvelope<GameNotification>[] {
+  if (envelopes.some((item) => item.sequenceNumber === incoming.sequenceNumber)) {
+    return envelopes;
+  }
+  return [...envelopes, incoming].sort(
+    (left, right) => left.sequenceNumber - right.sequenceNumber,
+  );
+}

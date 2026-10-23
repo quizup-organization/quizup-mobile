@@ -11,7 +11,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { SessionBootstrap, useAuthStatus } from "@/features/auth";
+import { SessionBootstrap, useAuthStatus, useSession } from "@/features/auth";
+import { useNotificationStream } from "@/features/notifications/hooks/use-notification-stream";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider, useThemeSettings } from "@/providers/theme-provider";
 import { useNativeColors } from "@/theme";
@@ -77,6 +78,8 @@ function RootNavigator() {
 
 function RootLayoutContent() {
   const { resolvedScheme } = useThemeSettings();
+  const session = useSession();
+  useNotificationStream(session?.userId);
 
   return (
     <NavigationThemeProvider

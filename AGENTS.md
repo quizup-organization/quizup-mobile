@@ -22,8 +22,8 @@ Application mobile QuizUp :
 - **Login** OTP / Google / Facebook ; en mode démo, une session factice est créée.
 - Données BFF réelles ; mocks disponibles uniquement en mode démo local.
 
-Hors périmètre immédiat : duel humain/appariement public, temps réel STOMP, upload
-média, rédaction de questions, push OS, i18n complète.
+Hors périmètre immédiat : duel humain/appariement public, upload média, rédaction de
+questions, push OS (tokens FCM/APNs et store builds), i18n complète.
 
 ---
 
@@ -35,7 +35,8 @@ média, rédaction de questions, push OS, i18n complète.
 - **Un seul `Host` par écran**, porté par `Screen`.
 - **Thème natif** : `useNativeColors()` → `PlatformColor` (iOS),
   `useMaterialColors` (Android), couleurs système CSS (web).
-- **TanStack Query** (état serveur), **Zustand** (session), **Zod** (schémas).
+- **TanStack Query** (état serveur), **Zustand** (session), **Zod** (schémas),
+  **`@stomp/stompjs`** (push live BFF `/ws/websocket`, connexion mutualisée).
 - **Headers natifs** : chaque onglet a un `Stack` natif (`TabStack`), les détails sont
   poussés sur le **root stack** (tab bar masquée).
 - **`expo-symbols`** (+ `expo-font`) pour les icônes des headers natifs.
@@ -62,7 +63,7 @@ app/
     (challenges)/_layout.tsx + index.tsx
     (profile)/_layout.tsx + index.tsx
 src/
-  lib/                        # config, query client/keys, session, préférences
+  lib/                        # config, query client/keys, session, ws STOMP, préférences
   shared/                     # types/api, composants d'état, utils
   features/
     auth/                     # domain, lib, stores, hooks, pages
@@ -118,9 +119,11 @@ src/
     cloche ; détails sur le root stack (tab bar masquée) ; headers natifs ; badge
     Défis = défis reçus + salons en attente ; badge cloche = non-lus. Le duel bot
     enchaîne fiche sujet → salon → arène → résultat ; l'arène masque le header et
-    désactive le geste de retour (sortie par abandon confirmé). L'arène rejoue
-    l'historique REST des notifications toutes les 500 ms ; le push STOMP viendra
-    remplacer ce polling sans changer le fold `GameState`.
+    désactive le geste de retour (sortie par abandon confirmé). L'inbox, les salles
+    et l'arène combinent l'historique REST et le push STOMP (`/topic/notifications/{userId}`,
+    `/topic/rooms/{id}`, `/topic/games/{id}`) ; le polling REST reste le filet de
+    rattrapage après déconnexion et ne change pas le fold `GameState`. La connexion
+    est coupée en arrière-plan (`AppState`) et rejouée au retour.
 12. **Mode réel par défaut** : `EXPO_PUBLIC_AUTH_MODE=identity` et
     `EXPO_PUBLIC_DATA_SOURCE=api`. Pour la démo locale uniquement, forcer les deux à
     `mock` ; `EXPO_PUBLIC_MOCK_SCENARIO=success|empty|error`. Chaque service a alors

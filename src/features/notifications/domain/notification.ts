@@ -30,6 +30,17 @@ export interface NotificationPreferenceView {
   enabled: boolean;
 }
 
+/** Payload du push STOMP `NOTIFICATION_DELETED`. */
+export interface NotificationDeletedPayload {
+  notificationId: string;
+}
+
+/** Enveloppe d'une trame STOMP d'inbox. */
+export interface NotificationEnvelope {
+  eventType?: string;
+  payload?: NotificationView | NotificationDeletedPayload;
+}
+
 export function isUnread(notification: NotificationView): boolean {
   return notification.readAt === null;
 }
