@@ -1,9 +1,16 @@
-import { AppCard, AppText, Column, ProgressBar, Row, Spacer } from "@/components";
+import {
+  AppCard,
+  AppText,
+  Column,
+  ProgressBar,
+  Row,
+  Section,
+  Spacer,
+} from "@/components";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { topicName } from "@/features/topics/domain/topic";
 import { useTopicStats } from "@/features/player/hooks/use-topic-stats";
 import { EmptyState } from "@/shared/components/empty-state";
-import { Section } from "@/components";
 import { formatNumber } from "@/shared/utils/format";
 
 export function TopicStatsSection({

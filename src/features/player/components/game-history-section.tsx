@@ -1,8 +1,15 @@
-import { AppAvatar, AppCard, AppText, Column, Row, Spacer } from "@/components";
+import {
+  AppAvatar,
+  AppCard,
+  AppText,
+  Column,
+  Row,
+  Section,
+  Spacer,
+} from "@/components";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { topicName } from "@/features/topics/domain/topic";
 import { useProfileGames } from "@/features/player/hooks/use-profile-games";
-import { Section } from "@/components";
 import { EmptyState } from "@/shared/components/empty-state";
 import { formatNumber } from "@/shared/utils/format";
 

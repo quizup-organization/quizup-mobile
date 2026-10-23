@@ -14,12 +14,14 @@ import type { PeopleDirection } from "@/features/player/domain/profile";
 import { PlayerRow } from "@/features/player/components/player-row";
 import { usePlayerSearch } from "@/features/player/hooks/use-player-search";
 import { usePeopleDirectory } from "@/features/social/hooks/use-people-directory";
+import { useContentWidth } from "@/hooks/use-content-width";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 
 export function SocialPage() {
   const router = useRouter();
+  const width = useContentWidth();
   const [direction, setDirection] = useState<PeopleDirection>("following");
   const [query, setQuery] = useState("");
   const { me, people } = usePeopleDirectory(direction);
@@ -69,6 +71,7 @@ export function SocialPage() {
           autoCapitalize="none"
           autoCorrect={false}
           onChangeText={setQuery}
+          style={{ width }}
         />
         {!searching ? (
           <Carousel

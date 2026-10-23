@@ -16,6 +16,7 @@ import {
   Spacer,
 } from "@/components";
 import { useMe } from "@/features/profile/hooks/use-me";
+import { useContentWidth } from "@/hooks/use-content-width";
 import { useUpdateProfile } from "@/features/player/hooks/use-update-profile";
 import type { Language } from "@/features/player/domain/profile";
 import {
@@ -25,6 +26,7 @@ import {
 } from "@/shared/avatar/dicebear";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
+import { useNativeColors } from "@/theme";
 
 const COUNTRIES = ["FR", "BE", "CH", "CA", "SN", "JP"];
 const LANGUAGES: { id: Language; label: string }[] = [
@@ -34,6 +36,8 @@ const LANGUAGES: { id: Language; label: string }[] = [
 
 export function ProfileEditPage() {
   const router = useRouter();
+  const width = useContentWidth();
+  const colors = useNativeColors();
   const me = useMe();
   const update = useUpdateProfile(me.data?.userId ?? "");
   const [pseudonym, setPseudonym] = useState(me.data?.pseudonym ?? "");
@@ -62,6 +66,16 @@ export function ProfileEditPage() {
       ? avatarOptions.backgroundColor
       : AVATAR_BACKGROUNDS[0],
   );
+  const currentStyle =
+    typeof avatarOptions?.style === "string"
+      ? avatarOptions.style
+      : canUseMicah
+        ? "micah"
+        : "base";
+  const currentBackground =
+    typeof avatarOptions?.backgroundColor === "string"
+      ? avatarOptions.backgroundColor
+      : AVATAR_BACKGROUNDS[0];
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -103,22 +117,32 @@ export function ProfileEditPage() {
 
   function save() {
     if (!me.data || !pseudonym.trim()) return;
-    update.mutate(
-      {
-        pseudonym: pseudonym.trim(),
-        bio: bio.trim() || null,
-        country,
-        language,
-        avatarOptions: JSON.stringify({
-          ...preservedAvatarOptions,
-          style,
-          backgroundColor,
-        }),
-      },
-      {
-        onSuccess: () => router.back(),
-      },
-    );
+    const nextBio = bio.trim() || null;
+    const nextAvatarOptions = JSON.stringify({
+      ...preservedAvatarOptions,
+      style,
+      backgroundColor,
+    });
+    const patch: Parameters<typeof update.mutate>[0] = {};
+
+    if (pseudonym.trim() !== me.data.pseudonym) patch.pseudonym = pseudonym.trim();
+    if (nextBio !== me.data.bio) patch.bio = nextBio;
+    if (country !== me.data.country) patch.country = country;
+    if (language !== me.data.language) patch.language = language;
+    if (
+      style !== currentStyle ||
+      backgroundColor !== currentBackground
+    ) {
+      patch.avatarOptions = nextAvatarOptions;
+    }
+    if (Object.keys(patch).length === 0) {
+      router.back();
+      return;
+    }
+
+    update.mutate(patch, {
+      onSuccess: () => router.back(),
+    });
   }
 
   return (
@@ -135,6 +159,7 @@ export function ProfileEditPage() {
               placeholder="Ton pseudonyme"
               maxLength={100}
               onChangeText={setPseudonym}
+              style={{ width: width - 30 }}
             />
             <AppText variant="caption" tone="muted">
               Bio
@@ -145,7 +170,7 @@ export function ProfileEditPage() {
               maxLength={300}
               multiline
               onChangeText={setBio}
-              style={{ height: 88 }}
+              style={{ width: width - 30, height: 88 }}
             />
           </AppCard>
         </Section>
@@ -241,7 +266,9 @@ export function ProfileEditPage() {
                     backgroundColor: color,
                     borderWidth: backgroundColor === color ? 3 : 1,
                     borderColor:
-                      backgroundColor === color ? "#ffffff" : "#d4d4d8",
+                      backgroundColor === color
+                        ? colors.text
+                        : colors.textSecondary,
                   }}
                 />
               ))}

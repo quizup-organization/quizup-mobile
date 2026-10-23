@@ -3,7 +3,10 @@ import { Row, Spacer, Text } from "@expo/ui";
 
 import { AppImage } from "@/components/fragments/image";
 import { decorativeModifiers } from "@/components/fragments/accessibility";
-import { avatarImageUrl } from "@/shared/avatar/dicebear";
+import {
+  avatarImageUrl,
+  parseAvatarOptions,
+} from "@/shared/avatar/dicebear";
 import { initials } from "@/shared/utils/format";
 import { useNativeColors } from "@/theme";
 
@@ -29,6 +32,11 @@ export function AppAvatar({
 }) {
   const colors = useNativeColors();
   const [failed, setFailed] = useState(false);
+  const parsedOptions = parseAvatarOptions(avatarOptions);
+  const fallbackBackground =
+    typeof parsedOptions?.backgroundColor === "string"
+      ? parsedOptions.backgroundColor
+      : colors.fill;
   const fallback = legacyInitials ?? initials(name ?? "?");
   const ring = ringColor ? 3 : 0;
   const inner = size - ring * 2;
@@ -51,7 +59,7 @@ export function AppAvatar({
         borderRadius: size / 2,
         borderWidth: ring,
         borderColor: ringColor ?? "transparent",
-        backgroundColor: colors.fill,
+        backgroundColor: fallbackBackground,
       }}
     >
       <Spacer flexible />

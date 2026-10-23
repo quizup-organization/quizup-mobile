@@ -12,12 +12,14 @@ import { PlayerRow } from "@/features/player/components/player-row";
 import { usePlayerSearch } from "@/features/player/hooks/use-player-search";
 import { TopicRow } from "@/features/topics/components/topic-row";
 import { useTopics } from "@/features/topics/hooks/use-topics";
+import { useContentWidth } from "@/hooks/use-content-width";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
 
 export function SearchPage() {
   const router = useRouter();
+  const width = useContentWidth();
   const [value, setValue] = useState("");
   const query = value.trim();
   const active = query.length >= 2;
@@ -102,6 +104,7 @@ export function SearchPage() {
         autoCorrect={false}
         returnKeyType="search"
         placeholder="Rechercher un sujet ou un joueur"
+        style={{ width }}
       />
 
       {content}

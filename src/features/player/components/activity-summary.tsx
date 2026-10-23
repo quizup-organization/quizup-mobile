@@ -1,4 +1,5 @@
 import { AppCard, AppText, Column, Row, Spacer } from "@/components";
+import { useNativeColors } from "@/theme";
 import { useProfileActivity } from "@/features/player/hooks/use-profile-activity";
 
 export function ActivitySummary({
@@ -9,6 +10,7 @@ export function ActivitySummary({
   language?: "fr" | "en";
 }) {
   const activity = useProfileActivity(userId);
+  const colors = useNativeColors();
 
   if (activity.isLoading) {
     return (
@@ -49,6 +51,23 @@ export function ActivitySummary({
             Jours actifs
           </AppText>
         </Column>
+      </Row>
+      <Row spacing={4} alignment="end">
+        {[...activity.data.days]
+          .slice(0, 14)
+          .reverse()
+          .map((day) => (
+            <Column
+              key={day.date}
+              style={{
+                width: 10,
+                height: 6 + Math.min(day.games, 5) * 5,
+                borderRadius: 3,
+                backgroundColor:
+                  day.games > 0 ? colors.accent : colors.fill,
+              }}
+            />
+          ))}
       </Row>
       <AppText variant="caption" tone="muted">
         {language === "fr"
