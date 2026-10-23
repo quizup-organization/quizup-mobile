@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.5.0...v1.6.0) (2026-10-23)
+
+### Features
+
+* **mobile:** branche les ecrans sur identity et le BFF ([bcab4f2](https://github.com/quizup-organization/quizup-mobile/commit/bcab4f2cf9f40642be1ba3592ab73b572b6c7d57))
+
 ## [1.5.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.4.0...v1.5.0) (2026-10-22)
 
 ### Features
