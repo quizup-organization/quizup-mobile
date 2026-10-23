@@ -1,3 +1,9 @@
+## [1.8.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.7.0...v1.8.0) (2026-10-23)
+
+### Features
+
+* **mobile:** ajoute le temps reel STOMP ([a07c4d1](https://github.com/quizup-organization/quizup-mobile/commit/a07c4d11550878bbce9bc997d9121d7bffd353dd))
+
 ## [1.7.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.6.0...v1.7.0) (2026-10-23)
 
 ### Features
