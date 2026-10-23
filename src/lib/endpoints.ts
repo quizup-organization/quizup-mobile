@@ -1,6 +1,8 @@
 /** Endpoints BFF consommés directement par l'app mobile. */
 export const ENDPOINTS = {
   me: "/api/me",
+  meOnboarding: "/api/me/onboarding/complete",
+  meRewards: "/api/me/rewards",
   home: "/api/home",
   suggestions: "/api/suggestions",
   topics: {
@@ -16,6 +18,7 @@ export const ENDPOINTS = {
     following: (userId: string) => `/api/profiles/${userId}/following`,
     followers: (userId: string) => `/api/profiles/${userId}/followers`,
     follow: (userId: string) => `/api/profiles/${userId}/follow`,
+    titles: (userId: string) => `/api/profiles/${userId}/titles`,
   },
   challenges: {
     mine: "/api/challenges/mine",

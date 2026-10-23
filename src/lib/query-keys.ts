@@ -11,6 +11,7 @@ import type {
 /** Fabrique de clés hiérarchiques (cache React Query) — mêmes formes que quizup-web. */
 export const queryKeys = {
   me: () => ["me"] as const,
+  meRewards: () => ["me", "rewards"] as const,
   home: () => ["home"] as const,
   topics: {
     all: ["topics"] as const,
@@ -25,6 +26,7 @@ export const queryKeys = {
   profiles: {
     all: ["profiles"] as const,
     detail: (userId: string) => ["profiles", "detail", userId] as const,
+    titles: (userId: string) => ["profiles", "titles", userId] as const,
     people: (
       userId: string,
       direction: PeopleDirection,

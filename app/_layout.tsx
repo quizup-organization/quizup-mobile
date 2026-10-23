@@ -13,6 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { SessionBootstrap, useAuthStatus, useSession } from "@/features/auth";
 import { useNotificationStream } from "@/features/notifications/hooks/use-notification-stream";
+import { useMe } from "@/features/profile/hooks/use-me";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider, useThemeSettings } from "@/providers/theme-provider";
 import { useNativeColors } from "@/theme";
@@ -24,28 +25,49 @@ void SplashScreen.preventAutoHideAsync().catch(() => {
 function RootNavigator() {
   const colors = useNativeColors();
   const status = useAuthStatus();
+  const me = useMe(status === "signedIn");
   const segments = useSegments();
   const router = useRouter();
+  const onboardingCompleted = me.data?.onboardingCompleted;
 
   useEffect(() => {
     if (status === "loading") return;
 
     const onLoginScreen = segments[0] === "login";
+    const onOnboardingScreen = segments[0] === "onboarding";
+    const hideSplash = () =>
+      void SplashScreen.hideAsync().catch(() => {
+        // Le splash a déjà été masqué.
+      });
 
-    if (status === "signedOut" && !onLoginScreen) {
-      router.replace("/login");
+    if (status === "signedOut") {
+      if (!onLoginScreen) router.replace("/login");
+      else hideSplash();
       return;
     }
 
-    if (status === "signedIn" && onLoginScreen) {
+    // Le shell attend la coquille `me` pour décider de l'onboarding.
+    if (me.isLoading) return;
+
+    if (onboardingCompleted === false) {
+      if (!onOnboardingScreen) router.replace("/onboarding");
+      else hideSplash();
+      return;
+    }
+
+    if (onLoginScreen || onOnboardingScreen) {
       router.replace("/");
       return;
     }
 
-    void SplashScreen.hideAsync().catch(() => {
-      // Le splash a déjà été masqué.
-    });
-  }, [status, segments, router]);
+    hideSplash();
+  }, [
+    status,
+    me.isLoading,
+    onboardingCompleted,
+    segments,
+    router,
+  ]);
 
   return (
     <>
@@ -62,6 +84,7 @@ function RootNavigator() {
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="topics/[id]" options={{ title: "Sujet" }} />
         <Stack.Screen name="players/[id]" options={{ title: "Joueur" }} />
         <Stack.Screen

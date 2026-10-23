@@ -33,7 +33,12 @@ const googleIosUrlScheme = googleIosClientId
  * locaux sans configuration fonctionnels (les boutons correspondants restent désactivés).
  */
 module.exports = ({ config }) => {
-  const plugins = [...(config.plugins ?? []), "expo-secure-store", withAndroidSigning];
+  const plugins = [
+    ...(config.plugins ?? []),
+    "expo-secure-store",
+    "expo-image",
+    withAndroidSigning,
+  ];
 
   if (googleIosUrlScheme) {
     plugins.push([

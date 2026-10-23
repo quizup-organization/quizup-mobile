@@ -25,7 +25,7 @@ import { topicName } from "@/features/topics/domain/topic";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { initials } from "@/shared/utils/format";
+
 
 function expiryLabel(iso: string): string {
   return new Date(iso).toLocaleTimeString("fr-FR", {
@@ -52,6 +52,7 @@ function ChallengeCard({
         <TopicEmoji
           emoji={challenge.topic.emoji}
           color={challenge.topic.color}
+          imageUrl={challenge.topic.imageUrl}
           size={40}
         />
         <Column spacing={2}>
@@ -88,7 +89,12 @@ function SentChallengeCard({ challenge }: { challenge: PendingChallenge }) {
   return (
     <AppCard>
       <Row spacing={12} alignment="center">
-        <AppAvatar initials={initials(opponent)} size={40} />
+        <AppAvatar
+          name={opponent}
+          userId={challenge.opponent.userId}
+          avatarOptions={challenge.opponent.avatarOptions}
+          size={40}
+        />
         <Column spacing={2}>
           <AppText variant="label" numberOfLines={1}>
             {name}
@@ -118,6 +124,7 @@ function RoomCard({
         <TopicEmoji
           emoji={room.topic.emoji}
           color={room.topic.color}
+          imageUrl={room.topic.imageUrl}
           size={40}
         />
         <Column spacing={2}>

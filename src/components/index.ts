@@ -11,6 +11,7 @@ export { AppChip } from "@/components/fragments/chip";
 export { AppDot } from "@/components/fragments/dot";
 export { AppIcon, type IconTone } from "@/components/fragments/icon";
 export { AppIconTile } from "@/components/fragments/icon-tile";
+export { AppImage } from "@/components/fragments/image";
 export { icons, type IconKey } from "@/components/fragments/icons";
 export { ProgressBar } from "@/components/fragments/progress-bar";
 export { AppRow } from "@/components/fragments/row";

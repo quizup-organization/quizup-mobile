@@ -1,8 +1,9 @@
 # AGENTS.md — quizup-mobile
 
-> Application mobile **Expo SDK 57 + Expo UI universal**. Phase actuelle : **écrans
-> branchés sur identity et le BFF** ; le mode démo mocké reste disponible explicitement
-> pour les tests locaux. L'IA est calquée sur la version actuelle de `quizup-web`.
+> Application mobile **Expo SDK 57 + Expo UI universal**. Phase actuelle : **cœur produit
+> réel** (identity, BFF, médias, avatars, onboarding, duel bot) ; le mode démo mocké reste
+> disponible explicitement pour les tests locaux. L'IA est calquée sur la version actuelle
+> de `quizup-web`.
 
 ---
 
@@ -19,6 +20,10 @@ Application mobile QuizUp :
 - **Duel bot natif** : `POST /api/rooms/bot` depuis la fiche sujet, salon de préparation
   (`/rooms/[id]`), arène (`/games/[id]`) et résultat (`/games/[id]/result`) ; reprise
   d'une partie active depuis l'accueil.
+- **Onboarding** premier compte (`/onboarding`) : centres d'intérêt puis explication
+  Elo/XP par sujet/maîtrise, avec `POST /api/me/onboarding/complete`.
+- **Médias réels** : images de sujets/bannières et avatars DiceBear rendus via
+  `expo-image` (pas seulement emoji/initiales).
 - **Login** OTP / Google / Facebook ; en mode démo, une session factice est créée.
 - Données BFF réelles ; mocks disponibles uniquement en mode démo local.
 
@@ -40,6 +45,8 @@ questions, push OS (tokens FCM/APNs et store builds), i18n complète.
 - **Headers natifs** : chaque onglet a un `Stack` natif (`TabStack`), les détails sont
   poussés sur le **root stack** (tab bar masquée).
 - **`expo-symbols`** (+ `expo-font`) pour les icônes des headers natifs.
+- **`expo-image`** pour les médias distants (couvertures, bannières) et les avatars
+  DiceBear ; seul pont RN autorisé via `AppImage`.
 - Architecture feature-based : `domain` (types + règles pures) → `lib` (services) →
   `hooks` (React Query) → `pages`/`components`.
 
@@ -52,6 +59,7 @@ app/
   search.tsx                  # recherche sujets/joueurs
   topics/[id].tsx             # fiche sujet (root stack)
   players/[id].tsx            # fiche joueur (root stack)
+  onboarding.tsx              # premier compte
   rooms/[id].tsx              # salon de préparation
   games/[id]/index.tsx        # arène de duel
   games/[id]/result.tsx       # résultat du duel
@@ -78,9 +86,11 @@ src/
     game/                     # domain (fold notifications), lib, hooks, pages (arène + résultat)
     settings/                 # domain (accents), pages
     search/                   # pages
+    onboarding/               # pages (premier compte)
     notifications/            # domain, lib, hooks, components, pages
   components/                 # design system Expo UI
     screen.tsx                # UNIQUE Host + ScrollView + refresh
+    fragments/image.tsx       # pont média unique (RNHostView + expo-image)
     layout/                   # TabStack, HeaderActions, Section, Carousel, Grid
     fragments/                # Text, Button, Card, Chip, Switch…
   providers/                  # QueryProvider, ThemeProvider
@@ -95,7 +105,9 @@ src/
 1. **`Screen` est l'unique `Host`** : un seul pont natif par écran. Ne jamais
    instancier de `Host` ailleurs.
 2. **Tout le contenu d'un écran est natif** : `Section`, `Carousel`, `Grid`, `Row`,
-   `Column`, `Spacer` et les fragments. Aucune vue RN dans le Host.
+   `Column`, `Spacer` et les fragments. Aucune vue RN directe dans le Host. **Exception
+   média** : uniquement `AppImage` (pont `RNHostView` + `expo-image`) et `AppAvatar` ;
+   ne jamais ouvrir un autre pont RN dans une page.
 3. **`app/` n'importe ni `react-native` ni `@expo/ui`** : uniquement `@/components`,
    `@/features`, `@/lib`, `@/shared`, `@/providers`, `@/theme`.
    Garde : `npm run check:boundaries`.

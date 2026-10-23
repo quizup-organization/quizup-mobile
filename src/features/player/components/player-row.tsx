@@ -2,7 +2,7 @@ import { AppAvatar, AppButton, AppText, Column, Row, Spacer } from "@/components
 import type { PlayerCard } from "@/features/player/domain/profile";
 import { isOnline } from "@/features/player/domain/profile";
 import { useSetPlayerFollow } from "@/features/player/hooks/use-set-player-follow";
-import { formatNumber, initials } from "@/shared/utils/format";
+import { formatNumber } from "@/shared/utils/format";
 
 export function PlayerRow({
   player,
@@ -26,7 +26,12 @@ export function PlayerRow({
   return (
     <Row spacing={12} alignment="center" style={{ paddingVertical: 8 }}>
       <Row spacing={12} alignment="center" onPress={onPress}>
-        <AppAvatar initials={initials(name)} size={40} />
+        <AppAvatar
+          name={name}
+          userId={player.userId}
+          avatarOptions={player.avatarOptions}
+          size={40}
+        />
         <Column spacing={2}>
           <AppText variant="label">{name}</AppText>
           <AppText variant="caption" tone="muted">

@@ -68,7 +68,7 @@ export const db: {
     },
     followingCount: 3,
     followersCount: 4,
-    onboardingCompleted: true,
+    onboardingCompleted: false,
     rewards: ["MICAH_AVATAR"],
     premium: false,
   },

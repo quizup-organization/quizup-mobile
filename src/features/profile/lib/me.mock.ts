@@ -13,4 +13,15 @@ export const meService = {
       stats: { ...db.me.stats },
     };
   },
+
+  async completeOnboarding(): Promise<Me> {
+    await mockDelay(250);
+    assertSuccess();
+    db.me.onboardingCompleted = true;
+    return {
+      ...db.me,
+      progression: { ...db.me.progression },
+      stats: { ...db.me.stats },
+    };
+  },
 };

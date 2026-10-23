@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
 import {
+  AppAvatar,
   AppButton,
   AppCard,
   AppText,
@@ -25,6 +26,7 @@ import {
 } from "@/features/game/domain/game";
 import type { GameChoice } from "@/features/game/domain/game-dto";
 import { useMe } from "@/features/profile/hooks/use-me";
+import { useProfile } from "@/features/player/hooks/use-profile";
 import type { ApiError } from "@/shared/types/api";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
@@ -51,6 +53,11 @@ function GameArena({ gameId }: { gameId: string }) {
   const round = currentRound(game);
   const meId = me.data?.userId ?? "";
   const isPlayer1 = game.player1Id === meId;
+  const opponentId = isPlayer1 ? game.player2Id : game.player1Id;
+  const opponentIsBot = isPlayer1 && game.player2Type === "BOT";
+  const opponentProfile = useProfile(
+    opponentId && !opponentIsBot ? opponentId : undefined,
+  );
   const myScore = isPlayer1 ? game.player1Score : game.player2Score;
   const opponentScore = isPlayer1 ? game.player2Score : game.player1Score;
   const opponentName =
@@ -201,7 +208,13 @@ function GameArena({ gameId }: { gameId: string }) {
 
         <AppCard>
           <Row spacing={12} alignment="center">
-            <Column spacing={2}>
+            <Column spacing={4} alignment="center">
+              <AppAvatar
+                name="Toi"
+                userId={meId}
+                avatarOptions={me.data?.avatarOptions}
+                size={42}
+              />
               <AppText variant="caption" tone="muted">
                 Toi
               </AppText>
@@ -212,7 +225,13 @@ function GameArena({ gameId }: { gameId: string }) {
               VS
             </AppText>
             <Spacer flexible />
-            <Column spacing={2} alignment="end">
+            <Column spacing={4} alignment="center">
+              <AppAvatar
+                name={opponentName}
+                userId={opponentId}
+                avatarOptions={opponentProfile.data?.avatarOptions}
+                size={42}
+              />
               <AppText variant="caption" tone="muted">
                 {opponentName}
               </AppText>

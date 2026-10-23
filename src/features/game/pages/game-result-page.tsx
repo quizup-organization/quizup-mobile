@@ -3,6 +3,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import {
+  AppAvatar,
   AppButton,
   AppCard,
   AppChip,
@@ -17,6 +18,8 @@ import {
 } from "@/components";
 import { useCreateBotRoom } from "@/features/rooms/hooks/use-create-bot-room";
 import { useGameResult } from "@/features/game/hooks/use-game-result";
+import { useGameState } from "@/features/game/hooks/use-game-state";
+import { localizedQuestion } from "@/features/game/domain/game";
 import { masteryGradeLabel } from "@/features/topics/domain/mastery";
 import { topicName } from "@/features/topics/domain/topic";
 import { useMe } from "@/features/profile/hooks/use-me";
@@ -42,6 +45,7 @@ export function GameResultPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const gameId = id ?? "";
   const resultQuery = useGameResult(gameId);
+  const reviewQuery = useGameState(gameId);
   const me = useMe();
   const session = useSession();
   const createBotRoom = useCreateBotRoom();
@@ -90,6 +94,9 @@ export function GameResultPage() {
         : "Adversaire");
   const reward = result.reward;
   const grade = masteryGradeLabel(result.topicMastery.grade);
+  const reviewRounds = Object.values(reviewQuery.game.rounds).filter(
+    (round) => round.questionText.length > 0,
+  );
 
   return (
     <>
@@ -115,7 +122,13 @@ export function GameResultPage() {
 
         <AppCard>
           <Row spacing={16} alignment="center">
-            <Column spacing={2}>
+            <Column spacing={4} alignment="center">
+              <AppAvatar
+                name="Toi"
+                userId={userId}
+                avatarOptions={me.data?.avatarOptions}
+                size={46}
+              />
               <AppText variant="caption" tone="muted">
                 Toi
               </AppText>
@@ -126,7 +139,14 @@ export function GameResultPage() {
               VS
             </AppText>
             <Spacer flexible />
-            <Column spacing={2} alignment="end">
+            <Column spacing={4} alignment="center">
+              <AppAvatar
+                name={opponentName}
+                userId={result.opponentId}
+                avatarOptions={result.opponent?.avatarOptions}
+                initialOnly={result.opponentDeleted}
+                size={46}
+              />
               <AppText variant="caption" tone="muted">
                 {opponentName}
               </AppText>
@@ -197,6 +217,40 @@ export function GameResultPage() {
             </AppText>
           </AppCard>
         </Section>
+
+        {reviewRounds.length > 0 ? (
+          <Section title="Revue des questions">
+            <Column spacing={8}>
+              {reviewRounds.map((round) => {
+                const question = localizedQuestion(round, language);
+                const mine = round.playerAnswers[userId];
+                const correct = round.correctAnswer
+                  ? question.answers[round.correctAnswer] ??
+                    round.correctAnswer
+                  : null;
+                return (
+                  <AppCard key={round.round}>
+                    <AppText variant="label" numberOfLines={3}>
+                      {question.questionText}
+                    </AppText>
+                    <AppText variant="caption" tone="muted">
+                      {`Ta réponse : ${
+                        mine?.choice
+                          ? question.answers[mine.choice] ?? mine.choice
+                          : "sans réponse"
+                      }`}
+                    </AppText>
+                    {correct ? (
+                      <AppText variant="caption" tone="accent">
+                        {`Bonne réponse : ${correct}`}
+                      </AppText>
+                    ) : null}
+                  </AppCard>
+                );
+              })}
+            </Column>
+          </Section>
+        ) : null}
 
         <Section>
           <Column spacing={8}>

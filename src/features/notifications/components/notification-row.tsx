@@ -1,4 +1,5 @@
 import {
+  AppAvatar,
   AppButton,
   AppDot,
   AppIconTile,
@@ -45,7 +46,16 @@ export function NotificationRow({
 
   return (
     <Row spacing={12} alignment="start" style={{ paddingVertical: 10 }}>
-      <AppIconTile name={NOTIFICATION_ICONS[notification.type]} size={40} />
+      {notification.actorId ? (
+        <AppAvatar
+          name={actorName}
+          userId={notification.actorId}
+          avatarOptions={actor.data?.avatarOptions}
+          size={40}
+        />
+      ) : (
+        <AppIconTile name={NOTIFICATION_ICONS[notification.type]} size={40} />
+      )}
       <Column spacing={2}>
         <AppText
           variant={unread ? "label" : "caption"}

@@ -25,7 +25,7 @@ import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { topicName } from "@/features/topics/domain/topic";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { initials } from "@/shared/utils/format";
+
 
 export function RoomPage() {
   const router = useRouter();
@@ -104,6 +104,7 @@ export function RoomPage() {
               <TopicEmoji
                 emoji={data.topic.emoji}
                 color={data.topic.color}
+                imageUrl={data.topic.imageUrl}
                 size={48}
               />
               <Column spacing={2}>
@@ -119,7 +120,12 @@ export function RoomPage() {
             </Row>
 
             <Row spacing={12} alignment="center">
-              <AppAvatar initials={initials(opponentName)} size={38} />
+              <AppAvatar
+                name={opponentName}
+                userId={data.opponent?.userId}
+                avatarOptions={data.opponent?.avatarOptions}
+                size={38}
+              />
               <Column spacing={2}>
                 <AppText variant="label">{opponentName}</AppText>
                 <AppText variant="caption" tone="muted">

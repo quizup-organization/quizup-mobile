@@ -11,18 +11,24 @@ export function AppCard({
   onPress,
   width,
   accessibilityLabel,
+  padding = 15,
+  radius = 18,
+  spacing = 8,
 }: {
   children: ReactNode;
   onPress?: () => void;
   width?: number;
   accessibilityLabel?: string;
+  padding?: number;
+  radius?: number;
+  spacing?: number;
 }) {
   const colors = useNativeColors();
   const screenWidth = useScreenWidth();
 
   return (
     <Column
-      spacing={8}
+      spacing={spacing}
       onPress={onPress}
       modifiers={
         onPress
@@ -31,9 +37,9 @@ export function AppCard({
       }
       style={{
         width: width ?? screenWidth,
-        padding: 15,
+        padding,
         backgroundColor: colors.surface,
-        borderRadius: 3,
+        borderRadius: radius,
       }}
     >
       {children}

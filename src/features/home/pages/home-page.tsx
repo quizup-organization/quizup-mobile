@@ -1,7 +1,9 @@
 import { useRouter } from "expo-router";
 
 import {
+  AppButton,
   AppCard,
+  AppImage,
   AppText,
   Carousel,
   Column,
@@ -13,18 +15,24 @@ import {
 import { useActiveGames } from "@/features/game/hooks/use-active-games";
 import { useHome } from "@/features/home/hooks/use-home";
 import { useMe } from "@/features/profile/hooks/use-me";
+import { useCreateBotRoom } from "@/features/rooms/hooks/use-create-bot-room";
 import { TopicCard } from "@/features/topics/components/topic-card";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { topicName } from "@/features/topics/domain/topic";
+import { useContentWidth } from "@/hooks/use-content-width";
+import { isMockData } from "@/lib/config";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
+import { formatNumber } from "@/shared/utils/format";
 
 export function HomePage() {
   const router = useRouter();
+  const width = useContentWidth();
   const home = useHome();
   const me = useMe();
   const activeGames = useActiveGames();
+  const createBotRoom = useCreateBotRoom();
 
   const refetch = () => {
     void home.refetch();
@@ -52,8 +60,15 @@ export function HomePage() {
   }
 
   const data = home.data;
-  const language = me.data?.language ?? "fr";
-  const pseudonym = me.data?.pseudonym;
+  const profile = me.data;
+  const language = profile?.language ?? "fr";
+  const pseudonym = profile?.pseudonym;
+  const heroTopic =
+    data?.followedTopics[0] ??
+    data?.trendingTopics[0] ??
+    data?.newTopics[0] ??
+    null;
+  const heroImage = heroTopic?.bannerUrl ?? heroTopic?.imageUrl;
   const empty =
     !data ||
     (data.followedTopics.length === 0 &&
@@ -61,6 +76,7 @@ export function HomePage() {
       data.newTopics.length === 0);
 
   const openTopic = (topicId: string) => router.push(`/topics/${topicId}`);
+  const seeAllTopics = () => router.push("/topics");
 
   return (
     <Screen
@@ -68,7 +84,7 @@ export function HomePage() {
       refreshing={home.isRefetching || me.isRefetching}
       onRefresh={refetch}
     >
-      <Column spacing={4}>
+      <Column spacing={6}>
         <AppText variant="title">
           {pseudonym ? `Bonjour ${pseudonym}` : "Bonjour"}
         </AppText>
@@ -76,6 +92,30 @@ export function HomePage() {
           Prêt pour ta session du jour ?
         </AppText>
       </Column>
+
+      <Row spacing={10} alignment="start">
+        <AppCard width={(width - 10) / 2} spacing={2}>
+          <AppText variant="caption" tone="muted">
+            Elo
+          </AppText>
+          <AppText variant="heading">
+            {profile?.progression.provisional
+              ? "Provisoire"
+              : formatNumber(profile?.progression.rating ?? 0)}
+          </AppText>
+        </AppCard>
+        <AppCard width={(width - 10) / 2} spacing={2}>
+          <AppText variant="caption" tone="muted">
+            Série
+          </AppText>
+          <AppText variant="heading">
+            {`${profile?.stats.currentWinStreak ?? 0}`}
+          </AppText>
+          <AppText variant="caption" tone="muted">
+            victoires d'affilée
+          </AppText>
+        </AppCard>
+      </Row>
 
       {activeGames.data && activeGames.data.length > 0 ? (
         <Section title="Reprendre">
@@ -99,7 +139,8 @@ export function HomePage() {
                     <TopicEmoji
                       emoji={game.topic.emoji}
                       color={game.topic.color}
-                      size={38}
+                      imageUrl={game.topic.imageUrl}
+                      size={42}
                     />
                     <Column spacing={2}>
                       <AppText variant="label" numberOfLines={1}>
@@ -128,19 +169,88 @@ export function HomePage() {
         />
       ) : (
         <>
-          {data.followedTopics.length > 0 ? (
+          {heroTopic ? (
+            <Section>
+              <AppCard padding={0} spacing={0}>
+                {heroImage ? (
+                  <AppImage
+                    source={{ uri: heroImage }}
+                    width={width}
+                    height={188}
+                    radius={18}
+                    accessibilityLabel={`Illustration de ${topicName(
+                      heroTopic.names,
+                      language,
+                      heroTopic.topicId,
+                    )}`}
+                  />
+                ) : (
+                  <Row style={{ height: 132 }} alignment="center">
+                    <Spacer flexible />
+                    <TopicEmoji
+                      emoji={heroTopic.emoji}
+                      color={heroTopic.color}
+                      size={64}
+                    />
+                    <Spacer flexible />
+                  </Row>
+                )}
+
+                <Column spacing={8} style={{ padding: 16 }}>
+                  <AppText variant="caption" tone="accent">
+                    {heroTopic.categoryLabel ?? "À la une"}
+                  </AppText>
+                  <AppText variant="title" numberOfLines={2}>
+                    {topicName(heroTopic.names, language, heroTopic.topicId)}
+                  </AppText>
+                  {heroTopic.description ? (
+                    <AppText variant="caption" tone="muted" numberOfLines={2}>
+                      {heroTopic.description}
+                    </AppText>
+                  ) : null}
+                  <AppButton
+                    label={
+                      createBotRoom.isPending ? "Préparation…" : "Jouer maintenant"
+                    }
+                    disabled={createBotRoom.isPending || isMockData}
+                    onPress={() =>
+                      createBotRoom.mutate(heroTopic.topicId, {
+                        onSuccess: (room) => router.push(`/rooms/${room.id}`),
+                      })
+                    }
+                  />
+                  {isMockData ? (
+                    <AppText variant="caption" tone="muted">
+                      Le duel est disponible en mode connecté.
+                    </AppText>
+                  ) : null}
+                  {createBotRoom.isError ? (
+                    <AppText variant="caption" tone="danger">
+                      Impossible de préparer la partie. Réessaie.
+                    </AppText>
+                  ) : null}
+                </Column>
+              </AppCard>
+            </Section>
+          ) : null}
+
+          {data.trendingTopics.length > 0 ? (
             <Section
-              title="Tes sujets"
-              action={`${data.followedTopics.length}`}
+              title="Top 10"
+              action="Tout voir"
+              onAction={seeAllTopics}
             >
               <Carousel
-                items={data.followedTopics}
+                items={data.trendingTopics}
                 itemWidth={176}
-                renderItem={(topic, width) => (
+                renderItem={(topic, cardWidth) => (
                   <TopicCard
                     topic={topic}
-                    width={width}
+                    width={cardWidth}
                     language={language}
+                    rank={
+                      data.trendingTopics.indexOf(topic) + 1
+                    }
                     onPress={() => openTopic(topic.topicId)}
                   />
                 )}
@@ -148,16 +258,21 @@ export function HomePage() {
             </Section>
           ) : null}
 
-          {data.trendingTopics.length > 0 ? (
-            <Section title="Tendances" action="Cette semaine">
+          {data.followedTopics.length > 0 ? (
+            <Section
+              title="Tes sujets"
+              action="Tout voir"
+              onAction={seeAllTopics}
+            >
               <Carousel
-                items={data.trendingTopics}
+                items={data.followedTopics}
                 itemWidth={176}
-                renderItem={(topic, width) => (
+                renderItem={(topic, cardWidth) => (
                   <TopicCard
                     topic={topic}
-                    width={width}
+                    width={cardWidth}
                     language={language}
+                    description
                     onPress={() => openTopic(topic.topicId)}
                   />
                 )}
@@ -166,15 +281,20 @@ export function HomePage() {
           ) : null}
 
           {data.newTopics.length > 0 ? (
-            <Section title="Nouveaux" action="À découvrir">
+            <Section
+              title="Nouveaux"
+              action="À découvrir"
+              onAction={seeAllTopics}
+            >
               <Carousel
                 items={data.newTopics}
                 itemWidth={176}
-                renderItem={(topic, width) => (
+                renderItem={(topic, cardWidth) => (
                   <TopicCard
                     topic={topic}
-                    width={width}
+                    width={cardWidth}
                     language={language}
+                    description
                     onPress={() => openTopic(topic.topicId)}
                   />
                 )}

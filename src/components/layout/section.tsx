@@ -8,10 +8,12 @@ import { AppText } from "@/components/fragments/text";
 export function Section({
   title,
   action,
+  onAction,
   children,
 }: {
   title?: string;
   action?: string;
+  onAction?: () => void;
   children: ReactNode;
 }) {
   const width = useScreenWidth();
@@ -23,7 +25,11 @@ export function Section({
           <AppText variant="heading">{title}</AppText>
           <Spacer flexible />
           {action ? (
-            <AppText variant="caption" tone="muted">
+            <AppText
+              variant="caption"
+              tone={onAction ? "accent" : "muted"}
+              onPress={onAction}
+            >
               {action}
             </AppText>
           ) : null}

@@ -1,9 +1,12 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 
+import { useContentWidth } from "@/hooks/use-content-width";
+
 import {
   AppAvatar,
   AppButton,
   AppCard,
+  AppImage,
   AppChip,
   AppText,
   Column,
@@ -11,17 +14,25 @@ import {
   Row,
   Screen,
   Section,
+  Spacer,
 } from "@/components";
 import type { PlayerProfile } from "@/features/player/domain/profile";
 import { isOnline } from "@/features/player/domain/profile";
 import { useProfile } from "@/features/player/hooks/use-profile";
+import { usePlayerTitles } from "@/features/profile/hooks/use-player-titles";
+import { useMe } from "@/features/profile/hooks/use-me";
+import { masteryGradeLabel } from "@/features/topics/domain/mastery";
+import { topicName } from "@/features/topics/domain/topic";
 import { useSetPlayerFollow } from "@/features/player/hooks/use-set-player-follow";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
-import { formatNumber, initials } from "@/shared/utils/format";
+import { formatNumber } from "@/shared/utils/format";
 
 function ProfileBody({ profile }: { profile: PlayerProfile }) {
+  const width = useContentWidth();
+  const language = useMe().data?.language ?? "fr";
+  const titles = usePlayerTitles(profile.userId);
   const follow = useSetPlayerFollow(profile.userId);
   const name = profile.pseudonym ?? "Joueur";
   const online = isOnline(profile.presence);
@@ -31,9 +42,24 @@ function ProfileBody({ profile }: { profile: PlayerProfile }) {
 
   return (
     <>
+      {profile.bannerUrl ? (
+        <AppImage
+          source={{ uri: profile.bannerUrl }}
+          width={width}
+          height={150}
+          radius={18}
+          accessibilityLabel={`Bannière de ${name}`}
+        />
+      ) : null}
+
       <Section>
         <Column spacing={10} alignment="center">
-          <AppAvatar initials={initials(name)} size={76} />
+          <AppAvatar
+            name={name}
+            userId={profile.userId}
+            avatarOptions={profile.avatarOptions}
+            size={84}
+          />
           <Column spacing={2} alignment="center">
             <AppText variant="title">{name}</AppText>
             {profile.bio ? (
@@ -107,6 +133,47 @@ function ProfileBody({ profile }: { profile: PlayerProfile }) {
               <AppChip key={badge.code} label={badge.label} icon="medal" />
             ))}
           </Row>
+        )}
+      </Section>
+
+      <Section title="Titres">
+        {titles.isLoading ? (
+          <AppText variant="caption" tone="muted">
+            Chargement des titres…
+          </AppText>
+        ) : (titles.data?.titles.length ?? 0) === 0 ? (
+          <EmptyState
+            title="Aucun titre débloqué"
+            subtitle="Les titres se gagnent en maîtrisant les sujets."
+          />
+        ) : (
+          <Column spacing={8}>
+            {titles.data!.titles.slice(0, 4).map((title) => (
+              <AppCard key={title.key}>
+                <Row spacing={10} alignment="center">
+                  <AppText variant="heading">
+                    {title.topic.emoji ?? "🏅"}
+                  </AppText>
+                  <Column spacing={2}>
+                    <AppText variant="label">
+                      {`${masteryGradeLabel(title.grade)} · ${topicName(
+                        title.topic.names,
+                        language,
+                        title.topicId,
+                      )}`}
+                    </AppText>
+                    <AppText variant="caption" tone="muted">
+                      {`${formatNumber(title.gradeRemainingXp)} XP avant le grade suivant`}
+                    </AppText>
+                  </Column>
+                  <Spacer flexible />
+                  {titles.data?.equippedKey === title.key ? (
+                    <AppChip label="Porté" selected />
+                  ) : null}
+                </Row>
+              </AppCard>
+            ))}
+          </Column>
         )}
       </Section>
     </>

@@ -25,7 +25,7 @@ export function AppIconTile({
       style={{
         width: size,
         height: size,
-        borderRadius: 3,
+        borderRadius: 12,
         backgroundColor: background ?? colors.fill,
       }}
     >

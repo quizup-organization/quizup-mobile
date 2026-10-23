@@ -6,6 +6,9 @@ import { meService as mockMeService } from "./me.mock";
 
 const apiMeService = {
   get: (): Promise<Me> => api.get<Me>(ENDPOINTS.me),
+
+  completeOnboarding: (): Promise<Me> =>
+    api.post<Me>(ENDPOINTS.meOnboarding),
 };
 
 /** Profil courant réel (`GET /api/me`) ou base de démonstration locale. */

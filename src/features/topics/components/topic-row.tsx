@@ -22,7 +22,12 @@ export function TopicRow({
       accessibilityLabel={`Sujet ${name}`}
     >
       <Row spacing={10} alignment="center">
-        <TopicEmoji emoji={topic.emoji} color={topic.color} size={36} />
+        <TopicEmoji
+          emoji={topic.emoji}
+          color={topic.color}
+          imageUrl={topic.imageUrl}
+          size={36}
+        />
         <Column spacing={2}>
           <AppText variant="label" numberOfLines={1}>
             {name}
