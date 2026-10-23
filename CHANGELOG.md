@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.10.0...v1.11.0) (2026-10-23)
+
+### Features
+
+* **mobile:** complete le profil et la decouverte sociale ([2ccc4e2](https://github.com/quizup-organization/quizup-mobile/commit/2ccc4e219e95fb1dfdab9e9bc7bb07cf9dd45405))
+
 ## [1.10.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.9.0...v1.10.0) (2026-10-23)
 
 ### Features
