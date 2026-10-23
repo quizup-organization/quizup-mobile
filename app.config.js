@@ -68,5 +68,10 @@ module.exports = ({ config }) => {
         process.env.ANDROID_VERSION_CODE ?? semanticVersionCode,
       ),
     },
+    ios: {
+      ...config.ios,
+      // Build TestFlight strictement croissant, aligné sur le versionCode Android.
+      buildNumber: process.env.IOS_BUILD_NUMBER ?? String(semanticVersionCode),
+    },
   };
 };

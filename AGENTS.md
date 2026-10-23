@@ -156,8 +156,10 @@ npm run doctor           # expo-doctor
   `fix(mobile):` / `perf(mobile):` → **patch**. `refactor`, `docs`, `chore` ne créent
   pas de version sémantique (APK per-push quand même publié).
 - `ci.yml` → job `boundaries` + workflow réutilisable `mobile-ci.yml`.
-- `release.yml` → `mobile-release.yml` : semantic-release, prebuild Android, APK
-  pre-release `apk-<run_id>`.
+- `release.yml` → `mobile-release.yml` : semantic-release, prebuild Android, APK + AAB
+  signés en pre-release `apk-<run_id>` (AAB prêt pour Play Console).
+- `ios.buildNumber` suit le même code croissant que `versionCode` (override
+  `IOS_BUILD_NUMBER`) ; le pipeline TestFlight reste à brancher avec les secrets Apple.
 - Les builds réels utilisent identity + BFF par défaut ; ne jamais livrer un build
   avec `EXPO_PUBLIC_AUTH_MODE=mock` ou `EXPO_PUBLIC_DATA_SOURCE=mock`.
 - Secrets : `QUIZUP_GITHUB_TOKEN`, `ANDROID_KEYSTORE_*` ; keystore local hors dépôt.
