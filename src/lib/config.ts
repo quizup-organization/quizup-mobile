@@ -6,9 +6,10 @@ import { Platform } from "react-native";
  * Les valeurs `EXPO_PUBLIC_*` sont embarquées dans le binaire : identifiants
  * publics uniquement. Les secrets restent côté identity.
  *
- * Tant que le BFF n'est pas branché, l'app tourne en mode démo :
- * - `EXPO_PUBLIC_AUTH_MODE` : `mock` (défaut) ou `identity`
- * - `EXPO_PUBLIC_DATA_SOURCE` : `mock` (défaut) ou `api`
+ * Par défaut, l'app est branchée sur identity et le BFF. Le mode démo reste
+ * disponible explicitement pour les tests locaux :
+ * - `EXPO_PUBLIC_AUTH_MODE` : `identity` (défaut) ou `mock`
+ * - `EXPO_PUBLIC_DATA_SOURCE` : `api` (défaut) ou `mock`
  * - `EXPO_PUBLIC_MOCK_SCENARIO` : `success` (défaut), `empty` ou `error`
  */
 function withoutTrailingSlash(value: string): string {
@@ -41,10 +42,10 @@ export const config = {
 } as const;
 
 export const authMode: AuthMode =
-  process.env.EXPO_PUBLIC_AUTH_MODE === "identity" ? "identity" : "mock";
+  process.env.EXPO_PUBLIC_AUTH_MODE === "mock" ? "mock" : "identity";
 
 export const dataSource: DataSource =
-  process.env.EXPO_PUBLIC_DATA_SOURCE === "api" ? "api" : "mock";
+  process.env.EXPO_PUBLIC_DATA_SOURCE === "mock" ? "mock" : "api";
 
 export const mockScenario: MockScenario =
   process.env.EXPO_PUBLIC_MOCK_SCENARIO === "empty"

@@ -1,8 +1,8 @@
 # AGENTS.md — quizup-mobile
 
 > Application mobile **Expo SDK 57 + Expo UI universal**. Phase actuelle : **écrans
-> alimentés par des mocks typés** (auth démo incluse), avant le branchement BFF.
-> L'IA est calquée sur la version actuelle de `quizup-web`.
+> branchés sur identity et le BFF** ; le mode démo mocké reste disponible explicitement
+> pour les tests locaux. L'IA est calquée sur la version actuelle de `quizup-web`.
 
 ---
 
@@ -17,7 +17,7 @@ Application mobile QuizUp :
 - Fiche sujet (`/topics/[id]`), fiche joueur (`/players/[id]`), réglages (`/settings`),
   recherche globale (`/search`).
 - **Login** OTP / Google / Facebook ; en mode démo, une session factice est créée.
-- Données mockées tant que le BFF n'est pas branché.
+- Données BFF réelles ; mocks disponibles uniquement en mode démo local.
 
 Hors périmètre immédiat : duel/arène réel, temps réel STOMP, upload média, rédaction
 de questions, push OS, i18n complète.
@@ -109,11 +109,11 @@ src/
 11. **IA** : 5 onglets (Accueil, Sujets, Social, Défis, Profil) ; notifications par la
     cloche ; détails sur le root stack (tab bar masquée) ; headers natifs ; badge
     Défis = défis reçus + salons en attente ; badge cloche = non-lus.
-12. **Phase démo** : `EXPO_PUBLIC_AUTH_MODE=mock` et `EXPO_PUBLIC_DATA_SOURCE=mock`
-    par défaut ; `EXPO_PUBLIC_MOCK_SCENARIO=success|empty|error`.
-    Les services mockés vivent dans `features/<x>/lib/` et devront être remplacés par
-    les services BFF ; les écrans/hooks restent inchangés. Un chip « Démo » signale le
-    mode dans Profil.
+12. **Mode réel par défaut** : `EXPO_PUBLIC_AUTH_MODE=identity` et
+    `EXPO_PUBLIC_DATA_SOURCE=api`. Pour la démo locale uniquement, forcer les deux à
+    `mock` ; `EXPO_PUBLIC_MOCK_SCENARIO=success|empty|error`. Chaque service a alors
+    son adaptateur `*.mock.ts` ; les écrans/hooks restent inchangés. Un chip « Démo »
+    signale le mode dans Profil.
 13. Contraintes connues : `List` n'est pas lazy, `Icon` ne rend pas sur le web,
     `matchContents` est figé au montage.
 14. **SwiftUI est iOS-only** : ne jamais importer `@expo/ui/swift-ui` dans un fichier
@@ -143,8 +143,8 @@ npm run doctor           # expo-doctor
 - `ci.yml` → job `boundaries` + workflow réutilisable `mobile-ci.yml`.
 - `release.yml` → `mobile-release.yml` : semantic-release, prebuild Android, APK
   pre-release `apk-<run_id>`.
-- Avant une vraie release : passer `EXPO_PUBLIC_AUTH_MODE=identity` et
-  `EXPO_PUBLIC_DATA_SOURCE=api`.
+- Les builds réels utilisent identity + BFF par défaut ; ne jamais livrer un build
+  avec `EXPO_PUBLIC_AUTH_MODE=mock` ou `EXPO_PUBLIC_DATA_SOURCE=mock`.
 - Secrets : `QUIZUP_GITHUB_TOKEN`, `ANDROID_KEYSTORE_*` ; keystore local hors dépôt.
 - `versionCode = major*1e6 + minor*1e3 + patch` (voir `app.config.js`).
 

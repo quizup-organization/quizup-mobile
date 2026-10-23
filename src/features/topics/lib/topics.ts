@@ -1,3 +1,7 @@
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/endpoints";
+import { isMockData } from "@/lib/config";
+import type { Page } from "@/shared/types/api";
 import type {
   TopicCard,
   TopicCategory,
@@ -7,154 +11,61 @@ import type {
   TopicLeaderboardParams,
   TopicListParams,
   TopicOverview,
-} from "@/features/topics/domain/topic";
-import type { Page } from "@/shared/types/api";
-import { ApiError } from "@/shared/types/api";
-import { toPage } from "@/shared/utils/page";
-import { db, getTopic, leaderboardFor, setFollowTopic } from "@/mocks/db";
-import { assertSuccess, isEmpty, mockDelay } from "@/mocks/scenario";
+} from "../domain/topic";
+import { topicsService as mockTopicsService } from "./topics.mock";
 
-function filterTopics(params: TopicListParams): TopicCard[] {
-  let topics = [...db.topics];
-  if (params.q?.trim()) {
-    const query = params.q.trim().toLowerCase();
-    topics = topics.filter((topic) =>
-      Object.values(topic.names).some((name) =>
-        name?.toLowerCase().includes(query),
-      ),
-    );
-  }
-  if (params.category) {
-    topics = topics.filter((topic) => topic.category === params.category);
-  }
-  if (params.followed) {
-    topics = topics.filter((topic) => topic.followed);
-  }
+const MAX_PAGE_SIZE = 100;
 
-  switch (params.sort) {
-    case "ALPHA":
-      return topics.sort((left, right) =>
-        (left.names.fr ?? "").localeCompare(right.names.fr ?? ""),
-      );
-    case "RECENT":
-      return topics.reverse();
-    case "MOST_PLAYED":
-    case "POPULAR":
-    default:
-      return topics.sort(
-        (left, right) => right.followersCount - left.followersCount,
-      );
-  }
-}
+const apiTopicsService = {
+  list: (params: TopicListParams = {}): Promise<Page<TopicCard>> =>
+    api.get<Page<TopicCard>>(ENDPOINTS.topics.list, {
+      params: {
+        q: params.q?.trim() || undefined,
+        category: params.category,
+        followed: params.followed ? true : undefined,
+        mine: params.mine ? true : undefined,
+        sort: params.sort,
+        page: params.page ?? 0,
+        size: Math.min(params.size ?? 24, MAX_PAGE_SIZE),
+      },
+    }),
 
-/** Implémentation mock du service Sujets — remplacée par le BFF en phase API. */
-export const topicsService = {
-  async list(params: TopicListParams = {}): Promise<Page<TopicCard>> {
-    await mockDelay();
-    assertSuccess();
-    if (isEmpty()) return toPage([], params.page ?? 0, params.size ?? 24);
-    return toPage(
-      filterTopics(params),
-      params.page ?? 0,
-      params.size ?? 24,
-    );
-  },
+  facets: (params: TopicFacetsParams = {}): Promise<TopicFacets> =>
+    api.get<TopicFacets>(ENDPOINTS.topics.facets, {
+      params: {
+        q: params.q?.trim() || undefined,
+        followed: params.followed ? true : undefined,
+      },
+    }),
 
-  async facets(params: TopicFacetsParams = {}): Promise<TopicFacets> {
-    await mockDelay(220);
-    assertSuccess();
-    if (isEmpty()) return { total: 0, categories: [] };
+  categories: (): Promise<TopicCategory[]> =>
+    api.get<TopicCategory[]>(ENDPOINTS.topics.categories),
 
-    const topics = filterTopics({
-      q: params.q,
-      followed: params.followed,
-      size: 100,
-    });
-    const counts = new Map<string, { label: string; count: number }>();
-    for (const topic of topics) {
-      if (!topic.category) continue;
-      const current = counts.get(topic.category);
-      counts.set(topic.category, {
-        label: topic.categoryLabel ?? topic.category,
-        count: (current?.count ?? 0) + 1,
-      });
-    }
+  overview: (topicId: string): Promise<TopicOverview> =>
+    api.get<TopicOverview>(ENDPOINTS.topics.overview(topicId)),
 
-    return {
-      total: topics.length,
-      categories: [...counts.entries()].map(([category, value]) => ({
-        category,
-        label: value.label,
-        count: value.count,
-      })),
-    };
-  },
-
-  async categories(): Promise<TopicCategory[]> {
-    await mockDelay(180);
-    assertSuccess();
-    if (isEmpty()) return [];
-
-    const categories = new Map<string, string>();
-    for (const topic of db.topics) {
-      if (topic.category) {
-        categories.set(topic.category, topic.categoryLabel ?? topic.category);
-      }
-    }
-    return [...categories.entries()].map(([category, label]) => ({
-      category,
-      label,
-    }));
-  },
-
-  async overview(topicId: string): Promise<TopicOverview> {
-    await mockDelay();
-    assertSuccess();
-    const topic = getTopic(topicId);
-    const progress = db.progress[topicId];
-    if (!topic || !progress) {
-      throw new ApiError("Sujet introuvable.", { statusCode: 404 });
-    }
-
-    const leaderboard = leaderboardFor(topicId);
-    const me = leaderboard.find((entry) => entry.userId === db.me.userId);
-
-    return {
-      topic,
-      titles: null,
-      myRank: me?.rank ?? null,
-      myProgress: progress,
-      canManage: false,
-    };
-  },
-
-  async leaderboard(
+  leaderboard: (
     topicId: string,
     params: TopicLeaderboardParams = {},
-  ): Promise<TopicLeaderboard> {
-    await mockDelay(260);
-    assertSuccess();
-    if (!getTopic(topicId)) {
-      throw new ApiError("Sujet introuvable.", { statusCode: 404 });
-    }
-    const entries = isEmpty() ? [] : leaderboardFor(topicId);
-    const me = entries.find((entry) => entry.userId === db.me.userId) ?? null;
+  ): Promise<TopicLeaderboard> =>
+    api.get<TopicLeaderboard>(ENDPOINTS.topics.leaderboard(topicId), {
+      params: {
+        period: params.period,
+        scope: params.scope,
+        month: params.month,
+        page: params.page ?? 0,
+        size: Math.min(params.size ?? 20, MAX_PAGE_SIZE),
+      },
+    }),
 
-    return {
-      entries: toPage(entries, params.page ?? 0, params.size ?? 20),
-      me,
-    };
-  },
+  follow: (topicId: string): Promise<void> =>
+    api.post<void>(ENDPOINTS.topics.follow(topicId)),
 
-  async follow(topicId: string): Promise<void> {
-    await mockDelay(180);
-    assertSuccess();
-    setFollowTopic(topicId, true);
-  },
-
-  async unfollow(topicId: string): Promise<void> {
-    await mockDelay(180);
-    assertSuccess();
-    setFollowTopic(topicId, false);
-  },
+  unfollow: (topicId: string): Promise<void> =>
+    api.delete<void>(ENDPOINTS.topics.follow(topicId)),
 };
+
+/** Catalogue et fiche sujet via le BFF, ou base de démonstration locale. */
+export const topicsService = isMockData
+  ? mockTopicsService
+  : apiTopicsService;

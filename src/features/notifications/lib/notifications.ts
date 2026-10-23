@@ -1,97 +1,57 @@
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/endpoints";
+import { isMockData } from "@/lib/config";
+import type { Page } from "@/shared/types/api";
 import type {
   NotificationCategory,
   NotificationPreferenceView,
   NotificationView,
-} from "@/features/notifications/domain/notification";
-import type { Page } from "@/shared/types/api";
-import { toPage } from "@/shared/utils/page";
-import {
-  db,
-  markAllNotificationsRead,
-  markNotificationRead,
-  markNotificationUnread,
-  removeNotification,
-} from "@/mocks/db";
-import { assertSuccess, isEmpty, mockDelay } from "@/mocks/scenario";
+} from "../domain/notification";
+import { notificationsService as mockNotificationsService } from "./notifications.mock";
 
-/** Implémentation mock du service Notifications — remplacée par le BFF en phase API. */
-export const notificationsService = {
-  async list(params: {
+const apiNotificationsService = {
+  list: (params: {
     unreadOnly: boolean;
     page: number;
     size: number;
-  }): Promise<Page<NotificationView>> {
-    await mockDelay(280);
-    assertSuccess();
-    if (isEmpty()) return toPage([], params.page, params.size);
+  }): Promise<Page<NotificationView>> =>
+    api.get<Page<NotificationView>>(ENDPOINTS.notifications.list, {
+      params: {
+        unreadOnly: params.unreadOnly,
+        page: params.page,
+        size: params.size,
+      },
+    }),
 
-    const notifications = [...db.notifications]
-      .sort(
-        (left, right) =>
-          new Date(right.createdAt).getTime() -
-          new Date(left.createdAt).getTime(),
-      )
-      .filter((notification) =>
-        params.unreadOnly ? notification.readAt === null : true,
-      );
+  unreadCount: (): Promise<{ count: number }> =>
+    api.get<{ count: number }>(ENDPOINTS.notifications.unreadCount),
 
-    return toPage(notifications, params.page, params.size);
-  },
+  markRead: (notificationId: string): Promise<void> =>
+    api.post<void>(ENDPOINTS.notifications.read(notificationId)),
 
-  async unreadCount(): Promise<{ count: number }> {
-    await mockDelay(180);
-    assertSuccess();
-    return {
-      count: db.notifications.filter(
-        (notification) => notification.readAt === null,
-      ).length,
-    };
-  },
+  markUnread: (notificationId: string): Promise<void> =>
+    api.post<void>(ENDPOINTS.notifications.unread(notificationId)),
 
-  async markRead(notificationId: string): Promise<void> {
-    await mockDelay(120);
-    assertSuccess();
-    markNotificationRead(notificationId);
-  },
+  remove: (notificationId: string): Promise<void> =>
+    api.delete<void>(ENDPOINTS.notifications.remove(notificationId)),
 
-  async markUnread(notificationId: string): Promise<void> {
-    await mockDelay(120);
-    assertSuccess();
-    markNotificationUnread(notificationId);
-  },
+  removeAll: (): Promise<void> =>
+    api.delete<void>(ENDPOINTS.notifications.removeAll),
 
-  async remove(notificationId: string): Promise<void> {
-    await mockDelay(120);
-    assertSuccess();
-    removeNotification(notificationId);
-  },
+  markAllRead: (): Promise<void> =>
+    api.post<void>(ENDPOINTS.notifications.readAll),
 
-  async removeAll(): Promise<void> {
-    await mockDelay(160);
-    assertSuccess();
-    db.notifications = [];
-  },
+  preferences: (): Promise<NotificationPreferenceView[]> =>
+    api.get<NotificationPreferenceView[]>(ENDPOINTS.notifications.preferences),
 
-  async markAllRead(): Promise<void> {
-    await mockDelay(160);
-    assertSuccess();
-    markAllNotificationsRead();
-  },
-
-  async preferences(): Promise<NotificationPreferenceView[]> {
-    await mockDelay(180);
-    assertSuccess();
-    return db.preferences.map((preference) => ({ ...preference }));
-  },
-
-  async updatePreference(
+  updatePreference: (
     category: NotificationCategory,
     enabled: boolean,
-  ): Promise<void> {
-    await mockDelay(120);
-    assertSuccess();
-    db.preferences = db.preferences.map((preference) =>
-      preference.category === category ? { ...preference, enabled } : preference,
-    );
-  },
+  ): Promise<void> =>
+    api.put<void>(ENDPOINTS.notifications.preference(category), { enabled }),
 };
+
+/** Inbox via le BFF, ou base de démonstration locale. */
+export const notificationsService = isMockData
+  ? mockNotificationsService
+  : apiNotificationsService;

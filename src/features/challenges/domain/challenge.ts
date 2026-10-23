@@ -7,6 +7,7 @@ export type ChallengeStatus =
   | "PENDING"
   | "ACCEPTED"
   | "DECLINED"
+  | "CANCELLED"
   | "EXPIRED";
 
 /** Défi nominatif en attente (`PendingChallengeView`). */
@@ -22,9 +23,14 @@ export interface PendingChallenge {
 export type RoomStatus =
   | "WAITING_PLAYERS"
   | "FETCHING_PLAYERS"
+  | "FETCHING_PLAYED_QUESTIONS"
+  | "FETCHING_QUESTIONS"
   | "CREATING_GAME"
   | "GAME_CREATED"
-  | "EXPIRED";
+  | "COMPLETED"
+  | "CANCELLED"
+  | "EXPIRED"
+  | "FAILED";
 
 /** Résumé de salle (`RoomView` réduit à ce que l'onglet Défis affiche). */
 export interface RoomSummary {
@@ -34,4 +40,11 @@ export interface RoomSummary {
   opponent: UserRef | null;
   vsBot: boolean;
   expiresAt: string;
+}
+
+/** Défis en attente + salons ouverts du joueur courant. */
+export interface ChallengesSnapshot {
+  received: PendingChallenge[];
+  sent: PendingChallenge[];
+  rooms: RoomSummary[];
 }

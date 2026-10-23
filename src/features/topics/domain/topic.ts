@@ -71,14 +71,12 @@ export interface TopicFacets {
 /** Progression du joueur courant sur un sujet (`TopicOverviewView.MyProgressView`). */
 export interface TopicProgress {
   xp: number;
+  /** Parties humaines terminées dans le sujet (abandon inclus). */
   games: number;
-  level: number;
-  title: string;
-  xpForNextLevel: number;
-  levelProgressPercent: number;
   completedQuestions: number;
   totalQuestions: number;
   completionPercent: number;
+  /** Maîtrise du sujet : grade atteint et marche vers le suivant. */
   grade: string;
   gradeProgressPercent: number;
   gradeRemainingXp: number;
@@ -101,7 +99,9 @@ export interface LeaderboardEntry {
   pseudonym: string | null;
   avatarOptions: string | null;
   country: string | null;
-  level: number;
+  /** Elo global courant (bordure d'avatar) et statut provisoire. */
+  rating: number;
+  provisional: boolean;
   totalXp: number;
   monthlyXp: number;
   suspended?: boolean;
@@ -117,6 +117,8 @@ export interface TopicListParams {
   q?: string;
   category?: string;
   followed?: boolean;
+  /** Sujets créés par le joueur courant. */
+  mine?: boolean;
   sort?: TopicSort;
   page?: number;
   size?: number;

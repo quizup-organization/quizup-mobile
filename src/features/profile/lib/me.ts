@@ -1,16 +1,12 @@
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/endpoints";
+import { isMockData } from "@/lib/config";
 import type { Me } from "@/features/profile/domain/me";
-import { db } from "@/mocks/db";
-import { assertSuccess, mockDelay } from "@/mocks/scenario";
+import { meService as mockMeService } from "./me.mock";
 
-/** Implémentation mock du profil courant — remplacée par le BFF en phase API. */
-export const meService = {
-  async get(): Promise<Me> {
-    await mockDelay();
-    assertSuccess();
-    return {
-      ...db.me,
-      progression: { ...db.me.progression },
-      stats: { ...db.me.stats },
-    };
-  },
+const apiMeService = {
+  get: (): Promise<Me> => api.get<Me>(ENDPOINTS.me),
 };
+
+/** Profil courant réel (`GET /api/me`) ou base de démonstration locale. */
+export const meService = isMockData ? mockMeService : apiMeService;

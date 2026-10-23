@@ -1,92 +1,86 @@
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/endpoints";
+import { isMockData } from "@/lib/config";
+import type { Page } from "@/shared/types/api";
+import { toPage } from "@/shared/utils/page";
 import type {
   PeopleDirection,
   PeopleParams,
   PlayerCard,
   PlayerProfile,
-} from "@/features/player/domain/profile";
-import type { Page } from "@/shared/types/api";
-import { ApiError } from "@/shared/types/api";
-import { toPage } from "@/shared/utils/page";
-import { db, getProfile, peopleFor, playerCard, setFollowPlayer } from "@/mocks/db";
-import { assertSuccess, isEmpty, mockDelay } from "@/mocks/scenario";
+} from "../domain/profile";
+import { profilesService as mockProfilesService } from "./profiles.mock";
 
-function sortPeople(people: PlayerCard[], sort: PeopleParams["sort"]): PlayerCard[] {
-  const copy = [...people];
-  if (sort === "LEVEL") {
-    return copy.sort((left, right) => right.level - left.level);
-  }
-  if (sort === "ALPHA") {
-    return copy.sort((left, right) =>
-      (left.pseudonym ?? "").localeCompare(right.pseudonym ?? ""),
-    );
-  }
-  return copy;
+const MAX_PAGE_SIZE = 100;
+
+interface Suggestion {
+  type: "TOPIC" | "PLAYER";
+  id: string;
+  label: string | null;
+  subtitle: string | null;
+  avatarOptions: string | null;
+  suspended?: boolean;
 }
 
-/** Implémentation mock du service Joueurs — remplacée par le BFF en phase API. */
-export const profilesService = {
-  async detail(userId: string): Promise<PlayerProfile> {
-    await mockDelay();
-    assertSuccess();
-    const profile = getProfile(userId);
-    if (!profile) {
-      throw new ApiError("Joueur introuvable.", { statusCode: 404 });
-    }
-    return {
-      ...profile,
-      following: db.following.has(userId),
-      progression: { ...profile.progression },
-      stats: { ...profile.stats },
-    };
-  },
+function peoplePath(userId: string, direction: PeopleDirection): string {
+  return direction === "following"
+    ? ENDPOINTS.profiles.following(userId)
+    : ENDPOINTS.profiles.followers(userId);
+}
 
-  async people(
+const apiProfilesService = {
+  detail: (userId: string): Promise<PlayerProfile> =>
+    api.get<PlayerProfile>(ENDPOINTS.profiles.detail(userId)),
+
+  people: (
+    userId: string,
     direction: PeopleDirection,
     params: PeopleParams = {},
-  ): Promise<Page<PlayerCard>> {
-    await mockDelay(260);
-    assertSuccess();
-    if (isEmpty()) return toPage([], params.page ?? 0, params.size ?? 20);
+  ): Promise<Page<PlayerCard>> =>
+    api.get<Page<PlayerCard>>(peoplePath(userId, direction), {
+      params: {
+        q: params.q?.trim() || undefined,
+        sort: params.sort ?? "RECENT",
+        page: params.page ?? 0,
+        size: Math.min(params.size ?? 20, MAX_PAGE_SIZE),
+      },
+    }),
 
-    let people = peopleFor(direction);
-    if (params.q?.trim()) {
-      const query = params.q.trim().toLowerCase();
-      people = people.filter((person) =>
-        (person.pseudonym ?? "").toLowerCase().includes(query),
-      );
-    }
+  /**
+   * Recherche unifiée : le BFF renvoie des suggestions typées. Les cartes joueur
+   * n'exposent pas encore l'Elo dans ce contrat, d'où le statut provisoire.
+   */
+  search: async (query: string): Promise<Page<PlayerCard>> => {
+    const normalized = query.trim();
+    if (normalized.length < 2) return toPage([], 0, 20);
 
-    return toPage(
-      sortPeople(people, params.sort),
-      params.page ?? 0,
-      params.size ?? 20,
-    );
+    const suggestions = await api.get<Suggestion[]>(ENDPOINTS.suggestions, {
+      params: { q: normalized, limit: 20 },
+    });
+    const players = suggestions
+      .filter((suggestion) => suggestion.type === "PLAYER")
+      .map<PlayerCard>((suggestion) => ({
+        userId: suggestion.id,
+        pseudonym: suggestion.label,
+        avatarOptions: suggestion.avatarOptions,
+        rating: 0,
+        provisional: true,
+        following: false,
+        presence: null,
+        suspended: suggestion.suspended,
+      }));
+
+    return toPage(players, 0, 20);
   },
 
-  async search(query: string): Promise<Page<PlayerCard>> {
-    await mockDelay(260);
-    assertSuccess();
-    if (isEmpty() || query.trim().length < 2) {
-      return toPage([], 0, 20);
-    }
-    const normalized = query.trim().toLowerCase();
-    const people = db.profiles
-      .filter((profile) =>
-        (profile.pseudonym ?? "").toLowerCase().includes(normalized),
-      )
-      .map((profile) => playerCard(profile));
-    return toPage(people, 0, 20);
-  },
+  follow: (userId: string): Promise<void> =>
+    api.put<void>(ENDPOINTS.profiles.follow(userId)),
 
-  async follow(userId: string): Promise<void> {
-    await mockDelay(180);
-    assertSuccess();
-    setFollowPlayer(userId, true);
-  },
-
-  async unfollow(userId: string): Promise<void> {
-    await mockDelay(180);
-    assertSuccess();
-    setFollowPlayer(userId, false);
-  },
+  unfollow: (userId: string): Promise<void> =>
+    api.delete<void>(ENDPOINTS.profiles.follow(userId)),
 };
+
+/** Joueurs via le BFF, ou base de démonstration locale. */
+export const profilesService = isMockData
+  ? mockProfilesService
+  : apiProfilesService;

@@ -8,11 +8,9 @@ import {
   AppText,
   Column,
   Grid,
-  ProgressBar,
   Row,
   Screen,
   Section,
-  Spacer,
 } from "@/components";
 import type { PlayerProfile } from "@/features/player/domain/profile";
 import { isOnline } from "@/features/player/domain/profile";
@@ -27,10 +25,9 @@ function ProfileBody({ profile }: { profile: PlayerProfile }) {
   const follow = useSetPlayerFollow(profile.userId);
   const name = profile.pseudonym ?? "Joueur";
   const online = isOnline(profile.presence);
-  const progressRatio =
-    profile.progression.xpForNextLevel > 0
-      ? profile.progression.xpTotal / profile.progression.xpForNextLevel
-      : 0;
+  const ratingLabel = profile.progression.provisional
+    ? "Elo provisoire"
+    : `Elo ${formatNumber(profile.progression.rating)}`;
 
   return (
     <>
@@ -45,7 +42,7 @@ function ProfileBody({ profile }: { profile: PlayerProfile }) {
               </AppText>
             ) : null}
             <AppText variant="caption" tone="muted">
-              {`Niveau ${profile.progression.level} · ${profile.progression.title}${profile.country ? ` · ${profile.country}` : ""}`}
+              {`${ratingLabel}${profile.country ? ` · ${profile.country}` : ""}`}
             </AppText>
             <AppText variant="caption" tone={online ? "accent" : "muted"}>
               {online ? "En ligne" : "Hors ligne"}
@@ -64,34 +61,14 @@ function ProfileBody({ profile }: { profile: PlayerProfile }) {
         </Column>
       </Section>
 
-      <Section>
-        <AppCard>
-          <Row spacing={8} alignment="center">
-            <AppText variant="label">Progression</AppText>
-            <Spacer flexible />
-            <AppText variant="caption" tone="muted">
-              {`${formatNumber(profile.progression.xpTotal)} / ${formatNumber(profile.progression.xpForNextLevel)} XP`}
-            </AppText>
-          </Row>
-          <Row alignment="center">
-            <ProgressBar value={progressRatio} label="Progression du niveau" />
-          </Row>
-          <Row spacing={12} alignment="center">
-            <AppText variant="caption" tone="muted">
-              {`${profile.followingCount} abonnements`}
-            </AppText>
-            <AppText variant="caption" tone="muted">
-              {`${profile.followersCount} abonnés`}
-            </AppText>
-          </Row>
-        </AppCard>
-      </Section>
-
       <Grid
         items={[
+          {
+            label: "Elo",
+            value: `${formatNumber(profile.progression.rating)}`,
+          },
           { label: "Parties", value: `${profile.stats.played}` },
           { label: "Victoires", value: `${profile.stats.winPercent} %` },
-          { label: "Série", value: `${profile.stats.currentWinStreak} j` },
         ]}
         columns={3}
         gap={10}
@@ -104,6 +81,22 @@ function ProfileBody({ profile }: { profile: PlayerProfile }) {
           </AppCard>
         )}
       />
+
+      <Section>
+        <AppCard>
+          <Row spacing={12} alignment="center">
+            <AppText variant="caption" tone="muted">
+              {`${profile.followingCount} abonnements`}
+            </AppText>
+            <AppText variant="caption" tone="muted">
+              {`${profile.followersCount} abonnés`}
+            </AppText>
+            <AppChip
+              label={`Pic ${formatNumber(profile.progression.peakRating)}`}
+            />
+          </Row>
+        </AppCard>
+      </Section>
 
       <Section title="Badges">
         {profile.progression.badges.length === 0 ? (

@@ -45,11 +45,11 @@ export const db: {
     language: "fr",
     equippedTitle: "sciences:CONFIRME",
     progression: {
-      xpTotal: 10_870,
-      level: 18,
-      title: "Explorateur",
-      xpForNextLevel: 12_500,
-      levelProgressPercent: 87,
+      rating: 1050,
+      peakRating: 1125,
+      ratedGames: 54,
+      provisional: false,
+
       badges: [
         { code: "STREAK_5", label: "Série de 5 jours" },
         { code: "PERFECT_DUEL", label: "Sans faute" },
@@ -68,6 +68,9 @@ export const db: {
     },
     followingCount: 3,
     followersCount: 4,
+    onboardingCompleted: true,
+    rewards: ["MICAH_AVATAR"],
+    premium: false,
   },
 
   topics: [
@@ -197,10 +200,6 @@ export const db: {
     sciences: {
       xp: 2_450,
       games: 34,
-      level: 9,
-      title: "Apprenti scientifique",
-      xpForNextLevel: 3_000,
-      levelProgressPercent: 82,
       completedQuestions: 34,
       totalQuestions: 48,
       completionPercent: 71,
@@ -212,10 +211,6 @@ export const db: {
     histoire: {
       xp: 1_120,
       games: 18,
-      level: 6,
-      title: "Conteur",
-      xpForNextLevel: 1_500,
-      levelProgressPercent: 74,
       completedQuestions: 17,
       totalQuestions: 36,
       completionPercent: 47,
@@ -227,10 +222,6 @@ export const db: {
     geographie: {
       xp: 1_680,
       games: 22,
-      level: 7,
-      title: "Explorateur",
-      xpForNextLevel: 2_000,
-      levelProgressPercent: 84,
       completedQuestions: 26,
       totalQuestions: 42,
       completionPercent: 62,
@@ -242,10 +233,6 @@ export const db: {
     sport: {
       xp: 540,
       games: 8,
-      level: 4,
-      title: "Supporter",
-      xpForNextLevel: 800,
-      levelProgressPercent: 67,
       completedQuestions: 9,
       totalQuestions: 31,
       completionPercent: 29,
@@ -257,10 +244,6 @@ export const db: {
     cinema: {
       xp: 980,
       games: 14,
-      level: 5,
-      title: "Cinéphile",
-      xpForNextLevel: 1_300,
-      levelProgressPercent: 75,
       completedQuestions: 15,
       totalQuestions: 28,
       completionPercent: 54,
@@ -272,10 +255,6 @@ export const db: {
     musique: {
       xp: 760,
       games: 11,
-      level: 5,
-      title: "Mélomane",
-      xpForNextLevel: 1_000,
-      levelProgressPercent: 76,
       completedQuestions: 12,
       totalQuestions: 24,
       completionPercent: 50,
@@ -287,10 +266,6 @@ export const db: {
     technologie: {
       xp: 2_100,
       games: 29,
-      level: 8,
-      title: "Bidouilleur",
-      xpForNextLevel: 2_600,
-      levelProgressPercent: 81,
       completedQuestions: 28,
       totalQuestions: 33,
       completionPercent: 85,
@@ -302,10 +277,6 @@ export const db: {
     nature: {
       xp: 430,
       games: 7,
-      level: 3,
-      title: "Promeneur",
-      xpForNextLevel: 700,
-      levelProgressPercent: 61,
       completedQuestions: 7,
       totalQuestions: 26,
       completionPercent: 27,
@@ -328,11 +299,11 @@ export const db: {
       following: true,
       presence: { userId: "camille", status: "ONLINE", lastSeenAt: iso(1) },
       progression: {
-        xpTotal: 12_480,
-        level: 24,
-        title: "Légende",
-        xpForNextLevel: 14_000,
-        levelProgressPercent: 89,
+        rating: 1200,
+        peakRating: 1275,
+        ratedGames: 72,
+        provisional: false,
+
         badges: [
           { code: "STREAK_5", label: "Série de 5 jours" },
           { code: "PERFECT_DUEL", label: "Sans faute" },
@@ -362,11 +333,11 @@ export const db: {
       following: false,
       presence: { userId: "yanis", status: "ONLINE", lastSeenAt: iso(2) },
       progression: {
-        xpTotal: 11_920,
-        level: 21,
-        title: "Stratège",
-        xpForNextLevel: 13_000,
-        levelProgressPercent: 92,
+        rating: 1125,
+        peakRating: 1200,
+        ratedGames: 63,
+        provisional: false,
+
         badges: [
           { code: "STREAK_5", label: "Série de 5 jours" },
           { code: "PERFECT_DUEL", label: "Sans faute" },
@@ -396,11 +367,11 @@ export const db: {
       following: true,
       presence: { userId: "sofia", status: "OFFLINE", lastSeenAt: iso(35) },
       progression: {
-        xpTotal: 11_350,
-        level: 19,
-        title: "Curieuse",
-        xpForNextLevel: 12_800,
-        levelProgressPercent: 88,
+        rating: 1075,
+        peakRating: 1150,
+        ratedGames: 57,
+        provisional: false,
+
         badges: [
           { code: "STREAK_5", label: "Série de 5 jours" },
           { code: "PERFECT_DUEL", label: "Sans faute" },
@@ -430,11 +401,11 @@ export const db: {
       following: false,
       presence: { userId: "malik", status: "OFFLINE", lastSeenAt: iso(180) },
       progression: {
-        xpTotal: 9_870,
-        level: 17,
-        title: "Touche-à-tout",
-        xpForNextLevel: 11_000,
-        levelProgressPercent: 90,
+        rating: 1025,
+        peakRating: 1100,
+        ratedGames: 51,
+        provisional: false,
+
         badges: [
           { code: "STREAK_5", label: "Série de 5 jours" },
           { code: "PERFECT_DUEL", label: "Sans faute" },
@@ -464,11 +435,11 @@ export const db: {
       following: true,
       presence: { userId: "ines", status: "ONLINE", lastSeenAt: iso(1) },
       progression: {
-        xpTotal: 8_940,
-        level: 15,
-        title: "Observatrice",
-        xpForNextLevel: 10_500,
-        levelProgressPercent: 85,
+        rating: 975,
+        peakRating: 1050,
+        ratedGames: 45,
+        provisional: false,
+
         badges: [
           { code: "STREAK_5", label: "Série de 5 jours" },
           { code: "PERFECT_DUEL", label: "Sans faute" },
@@ -498,11 +469,11 @@ export const db: {
       following: false,
       presence: { userId: "tom", status: "OFFLINE", lastSeenAt: iso(720) },
       progression: {
-        xpTotal: 7_620,
-        level: 13,
-        title: "Régulier",
-        xpForNextLevel: 9_000,
-        levelProgressPercent: 85,
+        rating: 925,
+        peakRating: 1000,
+        ratedGames: 39,
+        provisional: false,
+
         badges: [
           { code: "STREAK_5", label: "Série de 5 jours" },
           { code: "PERFECT_DUEL", label: "Sans faute" },
@@ -641,8 +612,8 @@ export function playerCard(profile: PlayerProfile): PlayerCard {
     userId: profile.userId,
     pseudonym: profile.pseudonym,
     avatarOptions: profile.avatarOptions,
-    level: profile.progression.level,
-    title: profile.progression.title,
+    rating: profile.progression.rating,
+    provisional: profile.progression.provisional,
     following: db.following.has(profile.userId),
     presence: profile.presence,
     suspended: profile.suspended,
@@ -686,9 +657,10 @@ export function leaderboardFor(topicId: string): LeaderboardEntry[] {
       pseudonym: profile.pseudonym,
       avatarOptions: profile.avatarOptions,
       country: profile.country,
-      level: profile.progression.level,
-      totalXp: profile.progression.xpTotal,
-      monthlyXp: Math.round(profile.progression.xpTotal * 0.18),
+      rating: profile.progression.rating,
+      provisional: profile.progression.provisional,
+      totalXp: profile.progression.rating * 10,
+      monthlyXp: Math.round(profile.progression.rating * 1.8),
       suspended: profile.suspended,
     }))
     .sort((left, right) => right.totalXp - left.totalXp)
@@ -700,8 +672,9 @@ export function leaderboardFor(topicId: string): LeaderboardEntry[] {
     pseudonym: me.pseudonym,
     avatarOptions: me.avatarOptions,
     country: me.country,
-    level: me.progression.level,
-    totalXp: me.progression.xpTotal,
+    rating: me.progression.rating,
+    provisional: me.progression.provisional,
+    totalXp: me.progression.rating * 10,
     monthlyXp: 1_950,
   };
 

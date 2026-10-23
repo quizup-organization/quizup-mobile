@@ -19,4 +19,10 @@ export interface Me {
   stats: DuelStats;
   followingCount: number;
   followersCount: number;
+  /** Onboarding terminé (ou première partie humaine jouée). */
+  onboardingCompleted?: boolean;
+  /** Récompenses persistées (`MICAH_AVATAR`, …). */
+  rewards?: string[];
+  /** Compte Premium : débloque les styles d'avatar DiceBear. */
+  premium?: boolean;
 }

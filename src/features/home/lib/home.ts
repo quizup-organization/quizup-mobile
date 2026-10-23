@@ -1,23 +1,12 @@
-import type { Home } from "@/features/home/domain/home";
-import { db } from "@/mocks/db";
-import { assertSuccess, isEmpty, mockDelay } from "@/mocks/scenario";
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/endpoints";
+import { isMockData } from "@/lib/config";
+import type { Home } from "../domain/home";
+import { homeService as mockHomeService } from "./home.mock";
 
-/** Implémentation mock du service Accueil — remplacée par le BFF en phase API. */
-export const homeService = {
-  async get(): Promise<Home> {
-    await mockDelay();
-    assertSuccess();
-
-    if (isEmpty()) {
-      return { followedTopics: [], trendingTopics: [], newTopics: [] };
-    }
-
-    const followedTopics = db.topics.filter((topic) => topic.followed).slice(0, 4);
-    const trendingTopics = [...db.topics]
-      .sort((left, right) => right.followersCount - left.followersCount)
-      .slice(0, 4);
-    const newTopics = [...db.topics].slice(-3).reverse();
-
-    return { followedTopics, trendingTopics, newTopics };
-  },
+const apiHomeService = {
+  get: (): Promise<Home> => api.get<Home>(ENDPOINTS.home),
 };
+
+/** Accueil réel (`GET /api/home`) ou base de démonstration locale. */
+export const homeService = isMockData ? mockHomeService : apiHomeService;

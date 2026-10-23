@@ -17,16 +17,18 @@ export function isOnline(presence: Presence | null | undefined): boolean {
 export interface Badge {
   code: string;
   label: string;
+  family?: string;
+  tier?: string;
 }
 
-/** Progression d'un joueur (`ProgressionView`). */
+/** Progression d'un joueur (`ProgressionView`) : badges et Elo global. */
 export interface Progression {
-  xpTotal: number;
-  level: number;
-  title: string;
-  xpForNextLevel: number;
-  levelProgressPercent: number;
   badges: Badge[];
+  /** Elo global (profil, matchmaking, bordure). */
+  rating: number;
+  peakRating: number;
+  ratedGames: number;
+  provisional: boolean;
 }
 
 /** Statistiques de duels d'un joueur (`DuelStatsView`). */
@@ -54,8 +56,8 @@ export interface PlayerCard {
   userId: string;
   pseudonym: string | null;
   avatarOptions: string | null;
-  level: number;
-  title: string | null;
+  rating: number;
+  provisional: boolean;
   following: boolean;
   presence: Presence | null;
   suspended?: boolean;
@@ -83,7 +85,7 @@ export interface PlayerProfile {
 
 export type PeopleDirection = "following" | "followers";
 
-export type PeopleSort = "RECENT" | "LEVEL" | "ALPHA";
+export type PeopleSort = "RECENT" | "ELO" | "ALPHA";
 
 export interface PeopleParams {
   q?: string;

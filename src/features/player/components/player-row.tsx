@@ -2,7 +2,7 @@ import { AppAvatar, AppButton, AppText, Column, Row, Spacer } from "@/components
 import type { PlayerCard } from "@/features/player/domain/profile";
 import { isOnline } from "@/features/player/domain/profile";
 import { useSetPlayerFollow } from "@/features/player/hooks/use-set-player-follow";
-import { initials } from "@/shared/utils/format";
+import { formatNumber, initials } from "@/shared/utils/format";
 
 export function PlayerRow({
   player,
@@ -14,6 +14,14 @@ export function PlayerRow({
   const follow = useSetPlayerFollow(player.userId);
   const name = player.pseudonym ?? "Joueur";
   const online = isOnline(player.presence);
+  const rating =
+    player.rating > 0
+      ? player.provisional
+        ? "Elo provisoire"
+        : `Elo ${formatNumber(player.rating)}`
+      : null;
+  const presence = online ? "En ligne" : "Hors ligne";
+  const subtitle = rating ? `${rating} · ${presence}` : presence;
 
   return (
     <Row spacing={12} alignment="center" style={{ paddingVertical: 8 }}>
@@ -22,7 +30,7 @@ export function PlayerRow({
         <Column spacing={2}>
           <AppText variant="label">{name}</AppText>
           <AppText variant="caption" tone="muted">
-            {`Niveau ${player.level} · ${online ? "En ligne" : "Hors ligne"}`}
+            {subtitle}
           </AppText>
         </Column>
       </Row>

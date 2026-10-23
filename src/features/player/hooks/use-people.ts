@@ -21,7 +21,7 @@ export function usePeople(
       direction,
       params,
     ),
-    queryFn: () => profilesService.people(direction, params),
+    queryFn: () => profilesService.people(userId ?? "", direction, params),
     enabled: Boolean(userId),
     staleTime: STALE_MS,
   });
