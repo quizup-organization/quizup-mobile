@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.6.0...v1.7.0) (2026-10-23)
+
+### Features
+
+* **mobile:** ajoute le duel bot natif ([796a25f](https://github.com/quizup-organization/quizup-mobile/commit/796a25fa8b9bd85da6946e84c4f962feb21d918b))
+
 ## [1.6.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.5.0...v1.6.0) (2026-10-23)
 
 ### Features
