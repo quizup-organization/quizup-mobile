@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.9.0...v1.10.0) (2026-10-23)
+
+### Features
+
+* **mobile:** refonte visuelle du coeur produit ([e94ff24](https://github.com/quizup-organization/quizup-mobile/commit/e94ff243f34ab399b7b3a02bf42e1eb69f11f51e))
+
 ## [1.9.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.8.0...v1.9.0) (2026-10-23)
 
 ### Features

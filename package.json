@@ -1,6 +1,6 @@
 {
   "name": "quizup-mobile",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/material-symbols": "^0.1.1",
