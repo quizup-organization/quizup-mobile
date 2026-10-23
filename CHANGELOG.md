@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.8.0...v1.9.0) (2026-10-23)
+
+### Features
+
+* **mobile:** aligne le build number iOS sur la version ([9d0a22f](https://github.com/quizup-organization/quizup-mobile/commit/9d0a22fee90c9897fee279246be6b0693f7809c6))
+
 ## [1.8.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.7.0...v1.8.0) (2026-10-23)
 
 ### Features
