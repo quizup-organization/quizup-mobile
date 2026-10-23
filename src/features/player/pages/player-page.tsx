@@ -21,6 +21,10 @@ import { isOnline } from "@/features/player/domain/profile";
 import { useProfile } from "@/features/player/hooks/use-profile";
 import { usePlayerTitles } from "@/features/profile/hooks/use-player-titles";
 import { useMe } from "@/features/profile/hooks/use-me";
+import { useHeadToHead } from "@/features/player/hooks/use-head-to-head";
+import { ActivitySummary } from "@/features/player/components/activity-summary";
+import { TopicStatsSection } from "@/features/player/components/topic-stats-section";
+import { GameHistorySection } from "@/features/player/components/game-history-section";
 import { masteryGradeLabel } from "@/features/topics/domain/mastery";
 import { topicName } from "@/features/topics/domain/topic";
 import { useSetPlayerFollow } from "@/features/player/hooks/use-set-player-follow";
@@ -31,7 +35,9 @@ import { formatNumber } from "@/shared/utils/format";
 
 function ProfileBody({ profile }: { profile: PlayerProfile }) {
   const width = useContentWidth();
-  const language = useMe().data?.language ?? "fr";
+  const me = useMe();
+  const language = me.data?.language ?? "fr";
+  const headToHead = useHeadToHead(me.data?.userId, profile.userId);
   const titles = usePlayerTitles(profile.userId);
   const follow = useSetPlayerFollow(profile.userId);
   const name = profile.pseudonym ?? "Joueur";
@@ -121,8 +127,21 @@ function ProfileBody({ profile }: { profile: PlayerProfile }) {
               label={`Pic ${formatNumber(profile.progression.peakRating)}`}
             />
           </Row>
+          {headToHead.data && headToHead.data.played > 0 ? (
+            <AppChip
+              label={`Face-à-face ${headToHead.data.wins}-${headToHead.data.losses}-${headToHead.data.draws}`}
+            />
+          ) : null}
         </AppCard>
       </Section>
+
+      <Section title="Activité">
+        <ActivitySummary userId={profile.userId} language={language} />
+      </Section>
+
+      <TopicStatsSection userId={profile.userId} language={language} />
+
+      <GameHistorySection userId={profile.userId} language={language} />
 
       <Section title="Badges">
         {profile.progression.badges.length === 0 ? (

@@ -18,6 +18,9 @@ import {
   Spacer,
 } from "@/components";
 import { useAuth } from "@/features/auth";
+import { ActivitySummary } from "@/features/player/components/activity-summary";
+import { TopicStatsSection } from "@/features/player/components/topic-stats-section";
+import { GameHistorySection } from "@/features/player/components/game-history-section";
 import { useMe } from "@/features/profile/hooks/use-me";
 import { usePlayerTitles } from "@/features/profile/hooks/use-player-titles";
 import { useRewards } from "@/features/profile/hooks/use-rewards";
@@ -141,6 +144,23 @@ export function ProfilePage() {
         )}
       />
 
+      <Section title="Activité">
+        <ActivitySummary
+          userId={profile.userId}
+          language={profile.language}
+        />
+      </Section>
+
+      <TopicStatsSection
+        userId={profile.userId}
+        language={profile.language}
+      />
+
+      <GameHistorySection
+        userId={profile.userId}
+        language={profile.language}
+      />
+
       <Section title="Badges">
         {profile.progression.badges.length === 0 ? (
           <EmptyState title="Aucun badge pour le moment" />
@@ -243,6 +263,12 @@ export function ProfilePage() {
 
       <Section title="Réglages">
         <Column spacing={2}>
+          <AppRow
+            icon="profile"
+            title="Modifier mon profil"
+            subtitle="Pseudonyme, bio, pays et avatar"
+            onPress={() => router.push("/profile-edit")}
+          />
           <AppRow
             icon="settings"
             title="Préférences"

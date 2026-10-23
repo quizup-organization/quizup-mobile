@@ -24,6 +24,10 @@ Application mobile QuizUp :
   Elo/XP par sujet/maîtrise, avec `POST /api/me/onboarding/complete`.
 - **Médias réels** : images de sujets/bannières et avatars DiceBear rendus via
   `expo-image` (pas seulement emoji/initiales).
+- **Profil complet** : édition pseudonyme/bio/pays/langue, choix du style et du fond
+  d'avatar sous entitlement, activité/série, sujets joués, historique de duels,
+  titres et récompenses. La fiche joueur expose les mêmes blocs + face-à-face.
+- **Social** : abonnements/abonnés et recherche de joueurs via `/api/suggestions`.
 - **Login** OTP / Google / Facebook ; en mode démo, une session factice est créée.
 - Données BFF réelles ; mocks disponibles uniquement en mode démo local.
 
@@ -60,6 +64,7 @@ app/
   topics/[id].tsx             # fiche sujet (root stack)
   players/[id].tsx            # fiche joueur (root stack)
   onboarding.tsx              # premier compte
+  profile-edit.tsx            # édition du profil
   rooms/[id].tsx              # salon de préparation
   games/[id]/index.tsx        # arène de duel
   games/[id]/result.tsx       # résultat du duel

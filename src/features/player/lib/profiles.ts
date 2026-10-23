@@ -4,11 +4,19 @@ import { isMockData } from "@/lib/config";
 import type { Page } from "@/shared/types/api";
 import { toPage } from "@/shared/utils/page";
 import type {
+  Language,
   PeopleDirection,
   PeopleParams,
   PlayerCard,
   PlayerProfile,
+  ProfileActivity,
+  TopicStat,
 } from "../domain/profile";
+import type {
+  GameHistoryItem,
+  HeadToHead,
+  ProfileGamesParams,
+} from "../domain/history";
 import { profilesService as mockProfilesService } from "./profiles.mock";
 
 const MAX_PAGE_SIZE = 100;
@@ -78,6 +86,65 @@ const apiProfilesService = {
 
   unfollow: (userId: string): Promise<void> =>
     api.delete<void>(ENDPOINTS.profiles.follow(userId)),
+
+  updatePseudonym: (userId: string, pseudonym: string): Promise<void> =>
+    api.put<void>(ENDPOINTS.profiles.pseudonym(userId), { pseudonym }),
+
+  updateBio: (userId: string, bio: string | null): Promise<void> =>
+    api.put<void>(ENDPOINTS.profiles.bio(userId), { bio }),
+
+  updateCountry: (userId: string, country: string | null): Promise<void> =>
+    api.put<void>(ENDPOINTS.profiles.country(userId), { country }),
+
+  updateLanguage: (userId: string, language: Language): Promise<void> =>
+    api.put<void>(ENDPOINTS.profiles.language(userId), { language }),
+
+  updateAvatarOptions: (
+    userId: string,
+    avatarOptions: string | null,
+  ): Promise<void> =>
+    api.put<void>(ENDPOINTS.profiles.avatarOptions(userId), {
+      avatarOptions,
+    }),
+
+  updateBanner: (userId: string, bannerUrl: string | null): Promise<void> =>
+    api.put<void>(ENDPOINTS.profiles.banner(userId), { bannerUrl }),
+
+  games: (
+    userId: string,
+    params: ProfileGamesParams = {},
+  ): Promise<Page<GameHistoryItem>> =>
+    api.get<Page<GameHistoryItem>>(ENDPOINTS.profiles.games(userId), {
+      params: {
+        topicId: params.topicId,
+        opponentId: params.opponentId,
+        opponentType: params.opponentType,
+        outcome:
+          params.outcome && params.outcome !== "ALL"
+            ? params.outcome
+            : undefined,
+        sort: params.sort,
+        page: params.page ?? 0,
+        size: Math.min(params.size ?? 20, MAX_PAGE_SIZE),
+      },
+    }),
+
+  headToHead: (userId: string, against: string): Promise<HeadToHead> =>
+    api.get<HeadToHead>(ENDPOINTS.profiles.headToHead(userId), {
+      params: { against },
+    }),
+
+  topicStats: (userId: string): Promise<TopicStat[]> =>
+    api.get<TopicStat[]>(ENDPOINTS.profiles.topics(userId)),
+
+  activity: (
+    userId: string,
+    from?: string,
+    to?: string,
+  ): Promise<ProfileActivity> =>
+    api.get<ProfileActivity>(ENDPOINTS.profiles.activity(userId), {
+      params: { from, to },
+    }),
 };
 
 /** Joueurs via le BFF, ou base de démonstration locale. */

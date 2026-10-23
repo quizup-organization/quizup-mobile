@@ -1,10 +1,29 @@
 /** Génération d'URL d'avatar DiceBear à partir des options persistées. */
 
-type AvatarOptions = Record<string, unknown>;
+export type AvatarOptions = Record<string, unknown>;
 
 const STYLES = new Set(["micah", "lorelei", "notionists"]);
 
-function parseOptions(value: string | null | undefined): AvatarOptions | null {
+export const AVATAR_STYLES = [
+  { id: "base", label: "Initiales" },
+  { id: "micah", label: "Micah" },
+  { id: "lorelei", label: "Lorelei" },
+  { id: "notionists", label: "Notionists" },
+] as const;
+
+export const AVATAR_BACKGROUNDS = [
+  "#e4e4e7",
+  "#dbeafe",
+  "#dcfce7",
+  "#fef9c3",
+  "#fae8ff",
+  "#ffe4e6",
+  "#e0f2fe",
+];
+
+export function parseAvatarOptions(
+  value: string | null | undefined,
+): AvatarOptions | null {
   if (!value) return null;
   try {
     const parsed: unknown = JSON.parse(value);
@@ -38,7 +57,7 @@ export function avatarImageUrl({
   avatarOptions?: string | null;
   size?: number;
 }): string | null {
-  const options = parseOptions(avatarOptions);
+  const options = parseAvatarOptions(avatarOptions);
   if (options?.style === "base") return null;
 
   const style =

@@ -93,3 +93,30 @@ export interface PeopleParams {
   page?: number;
   size?: number;
 }
+
+/** Jour actif du calendrier de série (`ActivityView.Day`). */
+export interface ActivityDay {
+  date: string;
+  games: number;
+}
+
+/** Activité journalière d'un joueur (`ActivityView`). */
+export interface ProfileActivity {
+  userId: string;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string | null;
+  totalActiveDays: number;
+  days: ActivityDay[];
+}
+
+/** Part d'un sujet dans l'activité du joueur (`TopicStatView`). */
+export interface TopicStat {
+  topicId: string;
+  names: { fr?: string; en?: string } | null;
+  emoji: string | null;
+  color: string | null;
+  imageUrl: string | null;
+  games: number;
+  xp: number;
+}

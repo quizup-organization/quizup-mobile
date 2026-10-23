@@ -92,6 +92,7 @@ function RootNavigator() {
           options={{ title: "Notifications" }}
         />
         <Stack.Screen name="settings" options={{ title: "Préférences" }} />
+        <Stack.Screen name="profile-edit" options={{ title: "Mon profil" }} />
         <Stack.Screen name="search" options={{ title: "Rechercher" }} />
       </Stack>
       <StatusBar style="auto" />

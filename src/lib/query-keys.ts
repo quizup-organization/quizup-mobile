@@ -27,6 +27,12 @@ export const queryKeys = {
     all: ["profiles"] as const,
     detail: (userId: string) => ["profiles", "detail", userId] as const,
     titles: (userId: string) => ["profiles", "titles", userId] as const,
+    activity: (userId: string) => ["profiles", "activity", userId] as const,
+    games: (userId: string, params: unknown) =>
+      ["profiles", "games", userId, params] as const,
+    topics: (userId: string) => ["profiles", "topics", userId] as const,
+    headToHead: (userId: string, against: string) =>
+      ["profiles", "head-to-head", userId, against] as const,
     people: (
       userId: string,
       direction: PeopleDirection,

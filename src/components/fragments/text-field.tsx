@@ -20,7 +20,7 @@ export function AppTextField({
         paddingHorizontal: 12,
         paddingVertical: 10,
         backgroundColor: colors.fill,
-        borderRadius: 3,
+        borderRadius: 12,
         ...style,
       }}
       textStyle={{
