@@ -5,6 +5,9 @@ import type { RoomView } from "../domain/room";
 
 /** Salles : création d'un duel bot, consultation et apparition. */
 export const roomsService = {
+  create: (topicId: string): Promise<IdResponse> =>
+    api.post<IdResponse>(ENDPOINTS.rooms.create, { topicId }),
+
   createBot: (
     topicId: string,
     difficulty: "EASY" | "NORMAL" | "HARD" = "NORMAL",
@@ -22,4 +25,7 @@ export const roomsService = {
 
   cancel: (roomId: string): Promise<void> =>
     api.post<void>(ENDPOINTS.rooms.cancel(roomId)),
+
+  wizz: (roomId: string): Promise<void> =>
+    api.post<void>(ENDPOINTS.rooms.wizz(roomId)),
 };

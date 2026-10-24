@@ -31,6 +31,7 @@ export const ENDPOINTS = {
     activity: (userId: string) => `/api/profiles/${userId}/activity`,
   },
   challenges: {
+    create: "/api/challenges",
     mine: "/api/challenges/mine",
     accept: (challengeId: string) =>
       `/api/challenges/${challengeId}/accept`,
@@ -39,12 +40,20 @@ export const ENDPOINTS = {
     cancel: (challengeId: string) => `/api/challenges/${challengeId}/cancel`,
   },
   rooms: {
+    create: "/api/rooms",
     mine: "/api/rooms/mine",
     bot: "/api/rooms/bot",
     detail: (roomId: string) => `/api/rooms/${roomId}`,
     join: (roomId: string) => `/api/rooms/${roomId}/join`,
     leave: (roomId: string) => `/api/rooms/${roomId}/leave`,
     cancel: (roomId: string) => `/api/rooms/${roomId}/cancel`,
+    wizz: (roomId: string) => `/api/rooms/${roomId}/wizz`,
+  },
+  matchmaking: {
+    tickets: "/api/matchmaking/tickets",
+    ticket: (ticketId: string) => `/api/matchmaking/tickets/${ticketId}`,
+    cancel: (ticketId: string) =>
+      `/api/matchmaking/tickets/${ticketId}/cancel`,
   },
   games: {
     active: "/api/games",

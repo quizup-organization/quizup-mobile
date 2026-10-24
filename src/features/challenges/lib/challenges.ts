@@ -79,6 +79,13 @@ async function listChallenges(): Promise<ChallengesSnapshot> {
 }
 
 const apiChallengesService = {
+  create: (params: {
+    topicId: string;
+    opponentId: string;
+    gameId?: string | null;
+  }): Promise<{ id: string }> =>
+    api.post<{ id: string }>(ENDPOINTS.challenges.create, params),
+
   list: listChallenges,
 
   async pendingCount(): Promise<number> {

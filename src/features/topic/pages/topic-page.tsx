@@ -16,7 +16,6 @@ import {
   Section,
   Spacer,
 } from "@/components";
-import { useCreateBotRoom } from "@/features/rooms/hooks/use-create-bot-room";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { masteryGradeLabel } from "@/features/topics/domain/mastery";
 import { topicName } from "@/features/topics/domain/topic";
@@ -25,7 +24,6 @@ import { useTopicLeaderboard } from "@/features/topic/hooks/use-topic-leaderboar
 import { useTopicOverview } from "@/features/topic/hooks/use-topic-overview";
 import { useMe } from "@/features/profile/hooks/use-me";
 import { useContentWidth } from "@/hooks/use-content-width";
-import { isMockData } from "@/lib/config";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
@@ -50,7 +48,6 @@ export function TopicPage() {
   const overview = useTopicOverview(topicId);
   const leaderboard = useTopicLeaderboard(topicId, { size: 5 });
   const follow = useSetTopicFollow(topicId);
-  const createBotRoom = useCreateBotRoom();
 
   const refetch = () => {
     void overview.refetch();
@@ -160,27 +157,10 @@ export function TopicPage() {
             </Row>
 
             <AppButton
-              label={
-                createBotRoom.isPending ? "Préparation…" : "Lancer un duel"
-              }
-              disabled={createBotRoom.isPending || isMockData}
+              label="Jouer"
               style={{ width: width - 32 }}
-              onPress={() =>
-                createBotRoom.mutate(topicId, {
-                  onSuccess: (room) => router.push(`/rooms/${room.id}`),
-                })
-              }
+              onPress={() => router.push(`/play/${topicId}`)}
             />
-            {isMockData ? (
-              <AppText variant="caption" tone="muted">
-                Le duel est disponible en mode connecté.
-              </AppText>
-            ) : null}
-            {createBotRoom.isError ? (
-              <AppText variant="caption" tone="danger">
-                Impossible de préparer le duel. Réessaie.
-              </AppText>
-            ) : null}
           </Column>
         </AppCard>
 

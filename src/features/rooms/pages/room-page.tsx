@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Share } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
 import {
@@ -21,6 +22,10 @@ import {
 } from "@/features/rooms/domain/room";
 import { useJoinRoom } from "@/features/rooms/hooks/use-join-room";
 import { useRoom } from "@/features/rooms/hooks/use-room";
+import {
+  useCancelRoom,
+  useWizzRoom,
+} from "@/features/rooms/hooks/use-room-actions";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { topicName } from "@/features/topics/domain/topic";
 import { ErrorState } from "@/shared/components/error-state";
@@ -33,11 +38,12 @@ export function RoomPage() {
   const roomId = id ?? "";
   const room = useRoom(roomId);
   const join = useJoinRoom(roomId);
+  const wizz = useWizzRoom(roomId);
+  const cancel = useCancelRoom(roomId);
   const joinStarted = useRef(false);
 
   useEffect(() => {
     if (joinStarted.current || !room.data) return;
-    if (room.data.initiatorPresent) return;
     if (
       room.data.status !== "WAITING_PLAYERS" &&
       room.data.status !== "FETCHING_PLAYERS"
@@ -90,6 +96,26 @@ export function RoomPage() {
   const failed = isRoomFailure(data.status);
   const terminal = failed || data.status === "COMPLETED";
   const progress = roomStatusProgress(data.status);
+  const opponentPresent = data.canCancel
+    ? data.participantPresent
+    : data.initiatorPresent;
+  const canShare = !data.vsBot && data.status === "WAITING_PLAYERS";
+  const canWizz =
+    !data.vsBot &&
+    data.status === "WAITING_PLAYERS" &&
+    data.opponent !== null &&
+    !opponentPresent;
+
+  async function shareRoom() {
+    try {
+      await Share.share({
+        title: "Rejoins mon duel QuizUp",
+        message: `Rejoins mon duel sur QuizUp : https://quizup.cnadjim.fr/join/${roomId} (ou quizup:///join/${roomId})`,
+      });
+    } catch {
+      // Partage annulé par l'utilisateur : aucune action.
+    }
+  }
 
   return (
     <>
@@ -164,6 +190,44 @@ export function RoomPage() {
                   disabled={join.isPending}
                 />
               </Column>
+            ) : null}
+            {canShare ? (
+              <AppButton
+                label="Partager le lien"
+                variant="outlined"
+                onPress={() => void shareRoom()}
+              />
+            ) : null}
+            {canWizz ? (
+              <AppButton
+                label={wizz.isPending ? "Relance…" : "Relancer l'adversaire"}
+                variant="text"
+                disabled={wizz.isPending}
+                onPress={() => wizz.mutate()}
+              />
+            ) : null}
+            {wizz.isError ? (
+              <AppText variant="caption" tone="danger">
+                Impossible de relancer pour le moment.
+              </AppText>
+            ) : null}
+            {data.canCancel && !terminal ? (
+              <AppButton
+                label={cancel.isPending ? "Annulation…" : "Annuler la salle"}
+                variant="text"
+                disabled={cancel.isPending}
+                onPress={() =>
+                  cancel.mutate(undefined, {
+                    onSuccess: () =>
+                      router.replace(`/topics/${data.topic.topicId}`),
+                  })
+                }
+              />
+            ) : null}
+            {cancel.isError ? (
+              <AppText variant="caption" tone="danger">
+                Impossible d'annuler la salle.
+              </AppText>
             ) : null}
           </AppCard>
         </Section>

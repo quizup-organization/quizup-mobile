@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -17,6 +17,7 @@ import {
   Spacer,
 } from "@/components";
 import { useCreateBotRoom } from "@/features/rooms/hooks/use-create-bot-room";
+import { useCreateChallenge } from "@/features/challenges/hooks/use-create-challenge";
 import { useGameResult } from "@/features/game/hooks/use-game-result";
 import { useGameState } from "@/features/game/hooks/use-game-state";
 import { localizedQuestion } from "@/features/game/domain/game";
@@ -49,6 +50,8 @@ export function GameResultPage() {
   const me = useMe();
   const session = useSession();
   const createBotRoom = useCreateBotRoom();
+  const rematch = useCreateChallenge();
+  const [rematchSent, setRematchSent] = useState(false);
   const result = resultQuery.data;
   const userId = me.data?.userId ?? session?.userId ?? "";
   const invalidated = useRef(false);
@@ -254,20 +257,47 @@ export function GameResultPage() {
 
         <Section>
           <Column spacing={8}>
-            {createBotRoom.isError ? (
+            {createBotRoom.isError || rematch.isError ? (
               <AppText variant="caption" tone="danger" align="center">
                 Impossible de préparer une nouvelle partie.
               </AppText>
             ) : null}
-            <AppButton
-              label={createBotRoom.isPending ? "Préparation…" : "Rejouer"}
-              disabled={createBotRoom.isPending}
-              onPress={() =>
-                createBotRoom.mutate(result.topic.topicId, {
-                  onSuccess: (room) => router.replace(`/rooms/${room.id}`),
-                })
-              }
-            />
+            {result.botGame ? (
+              <AppButton
+                label={createBotRoom.isPending ? "Préparation…" : "Rejouer"}
+                disabled={createBotRoom.isPending}
+                onPress={() =>
+                  createBotRoom.mutate(
+                    { topicId: result.topic.topicId },
+                    {
+                      onSuccess: (room) =>
+                        router.replace(`/rooms/${room.id}`),
+                    },
+                  )
+                }
+              />
+            ) : result.opponentId && !result.opponentDeleted ? (
+              <AppButton
+                label={
+                  rematchSent
+                    ? "Défi envoyé"
+                    : rematch.isPending
+                      ? "Envoi…"
+                      : "Défier à nouveau"
+                }
+                disabled={rematch.isPending || rematchSent}
+                onPress={() =>
+                  rematch.mutate(
+                    {
+                      topicId: result.topic.topicId,
+                      opponentId: result.opponentId as string,
+                      gameId,
+                    },
+                    { onSuccess: () => setRematchSent(true) },
+                  )
+                }
+              />
+            ) : null}
             <AppButton
               label="Retour au sujet"
               variant="outlined"

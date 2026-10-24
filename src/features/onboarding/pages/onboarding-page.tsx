@@ -90,9 +90,9 @@ export function OnboardingPage() {
 
     if (startDuel && duelTopic.data?.content[0]) {
       try {
-        const room = await createBot.mutateAsync(
-          duelTopic.data.content[0].topicId,
-        );
+        const room = await createBot.mutateAsync({
+          topicId: duelTopic.data.content[0].topicId,
+        });
         router.replace(`/rooms/${room.id}`);
         return;
       } catch {

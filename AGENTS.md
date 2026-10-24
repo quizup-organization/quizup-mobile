@@ -17,9 +17,12 @@ Application mobile QuizUp :
 - **Défis** : défis reçus/envoyés + salons, badge « pending ».
 - Fiche sujet (`/topics/[id]`), fiche joueur (`/players/[id]`), réglages (`/settings`),
   recherche globale (`/search`).
-- **Duel bot natif** : `POST /api/rooms/bot` depuis la fiche sujet, salon de préparation
-  (`/rooms/[id]`), arène (`/games/[id]`) et résultat (`/games/[id]/result`) ; reprise
-  d'une partie active depuis l'accueil.
+- **Modes de jeu** (`/play/[topicId]`) : duel bot avec difficulté, appariement public
+  (`/matchmaking/[ticketId]`), salle partagée par lien (`/join/[roomId]`) et défi
+  nominatif (`/challenge/[topicId]`).
+- **Duel natif** : salon de préparation (`/rooms/[id]`), arène (`/games/[id]`) et
+  résultat (`/games/[id]/result`) ; partage de salon, relance (« wizz »), annulation,
+  revanche par défi et reprise d'une partie active depuis l'accueil.
 - **Onboarding** premier compte (`/onboarding`) : centres d'intérêt puis explication
   Elo/XP par sujet/maîtrise, avec `POST /api/me/onboarding/complete`.
 - **Médias réels** : images de sujets/bannières et avatars DiceBear rendus via
@@ -31,8 +34,8 @@ Application mobile QuizUp :
 - **Login** OTP / Google / Facebook ; en mode démo, une session factice est créée.
 - Données BFF réelles ; mocks disponibles uniquement en mode démo local.
 
-Hors périmètre immédiat : duel humain/appariement public, upload média, rédaction de
-questions, push OS (tokens FCM/APNs et store builds), i18n complète.
+Hors périmètre immédiat : upload de bannière, atelier de rédaction de sujets, push OS
+(tokens FCM/APNs et store builds), i18n complète.
 
 ---
 
@@ -65,6 +68,10 @@ app/
   players/[id].tsx            # fiche joueur (root stack)
   onboarding.tsx              # premier compte
   profile-edit.tsx            # édition du profil
+  play/[topicId].tsx          # choix du mode de jeu
+  challenge/[topicId].tsx     # choix de l'adversaire pour un défi
+  matchmaking/[ticketId].tsx  # recherche d'un adversaire public
+  join/[roomId].tsx           # entrée d'un lien de partage
   rooms/[id].tsx              # salon de préparation
   games/[id]/index.tsx        # arène de duel
   games/[id]/result.tsx       # résultat du duel
@@ -87,6 +94,7 @@ src/
     social/                   # hooks, pages (annuaire)
     profile/                  # domain, lib, hooks, pages
     challenges/               # domain, lib, hooks, pages (défis + salons)
+    matchmaking/              # domain, lib, hooks, pages (modes de jeu + recherche publique)
     rooms/                    # domain, lib, hooks, pages (préparation de salle)
     game/                     # domain (fold notifications), lib, hooks, pages (arène + résultat)
     settings/                 # domain (accents), pages

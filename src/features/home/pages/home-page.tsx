@@ -15,12 +15,10 @@ import {
 import { useActiveGames } from "@/features/game/hooks/use-active-games";
 import { useHome } from "@/features/home/hooks/use-home";
 import { useMe } from "@/features/profile/hooks/use-me";
-import { useCreateBotRoom } from "@/features/rooms/hooks/use-create-bot-room";
 import { TopicCard } from "@/features/topics/components/topic-card";
 import { TopicEmoji } from "@/features/topics/components/topic-emoji";
 import { topicName } from "@/features/topics/domain/topic";
 import { useContentWidth } from "@/hooks/use-content-width";
-import { isMockData } from "@/lib/config";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ErrorState } from "@/shared/components/error-state";
 import { LoadingState } from "@/shared/components/loading-state";
@@ -32,7 +30,6 @@ export function HomePage() {
   const home = useHome();
   const me = useMe();
   const activeGames = useActiveGames();
-  const createBotRoom = useCreateBotRoom();
 
   const refetch = () => {
     void home.refetch();
@@ -209,26 +206,9 @@ export function HomePage() {
                     </AppText>
                   ) : null}
                   <AppButton
-                    label={
-                      createBotRoom.isPending ? "Préparation…" : "Jouer maintenant"
-                    }
-                    disabled={createBotRoom.isPending || isMockData}
-                    onPress={() =>
-                      createBotRoom.mutate(heroTopic.topicId, {
-                        onSuccess: (room) => router.push(`/rooms/${room.id}`),
-                      })
-                    }
+                    label="Jouer maintenant"
+                    onPress={() => router.push(`/play/${heroTopic.topicId}`)}
                   />
-                  {isMockData ? (
-                    <AppText variant="caption" tone="muted">
-                      Le duel est disponible en mode connecté.
-                    </AppText>
-                  ) : null}
-                  {createBotRoom.isError ? (
-                    <AppText variant="caption" tone="danger">
-                      Impossible de préparer la partie. Réessaie.
-                    </AppText>
-                  ) : null}
                 </Column>
               </AppCard>
             </Section>
