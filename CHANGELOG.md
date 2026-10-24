@@ -1,3 +1,9 @@
+## [1.12.0](https://github.com/quizup-organization/quizup-mobile/compare/v1.11.1...v1.12.0) (2026-10-24)
+
+### Features
+
+* **mobile:** ajoute les modes de jeu et l appariement ([21792fb](https://github.com/quizup-organization/quizup-mobile/commit/21792fb59a91d32f60f0129ef8da32256cd581cb))
+
 ## [1.11.1](https://github.com/quizup-organization/quizup-mobile/compare/v1.11.0...v1.11.1) (2026-10-23)
 
 ### Bug Fixes
